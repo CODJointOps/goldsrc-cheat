@@ -2,6 +2,7 @@
 #include "include/cvars.h"
 #include "include/sdk.h"
 #include "include/globals.h"
+#include "include/game_detection.h"
 
 DECL_CVAR(bhop);
 DECL_CVAR(autostrafe);
@@ -23,10 +24,13 @@ bool cvars_init(void) {
     REGISTER_CVAR(esp, 3);
     REGISTER_CVAR(chams, 1);
     REGISTER_CVAR(crosshair, 0);
-    REGISTER_CVAR(tracers, 1);
     REGISTER_CVAR(clmove, 0);
     REGISTER_CVAR(watermark, 1);
     REGISTER_CVAR(watermark_rainbow, 1);
-
+    if (IsCS16()) {
+    REGISTER_CVAR(tracers, 0);
+    } else {
+    REGISTER_CVAR(tracers, 1);
+    }
     return true;
 }
