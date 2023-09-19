@@ -40,6 +40,20 @@ void load(void) {
     /* Get game version after injecting */
     //this_game_id = get_cur_game();
 
+    if (IsCS16()) {
+        i_engine->pfnClientCmd("play 'sound/radio/go.wav'");
+    }
+    else if (IsDayOfDefeat()) {
+        i_engine->pfnClientCmd("play 'sound/player/gersniper.wav'");
+    }
+    else if (IsTFC()) {
+        i_engine->pfnClientCmd("play 'sound/misc/party2.wav'");
+    }
+    else
+    {
+        i_engine->pfnClientCmd("play 'valve/sound/vox/suit.wav'");
+    }
+    
     i_engine->pfnClientCmd("echo \"goldsource-cheat loaded successfully!\"");
     i_engine->pfnClientCmd("echo \"Deadzone rulez!\"");
     i_engine->pfnClientCmd("echo \"https://git.deadzone.lol/Wizzard/goldsource-cheat\"");

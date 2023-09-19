@@ -13,5 +13,6 @@ GameType get_current_game(void);
 int IsCS16(void);
 int IsHalfLife(void);
 int IsDayOfDefeat(void);
+int IsTFC(void);
 
 #endif
