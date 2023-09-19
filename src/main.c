@@ -8,6 +8,7 @@
 #include "include/cvars.h"
 #include "include/hooks.h"
 #include "include/util.h"
+#include "include/game_detection.h"
 
 static bool loaded = false;
 
@@ -40,6 +41,33 @@ void load(void) {
     this_game_id = get_cur_game();
 
     i_engine->pfnClientCmd("echo \"goldsource-cheat loaded successfully!\"");
+    i_engine->pfnClientCmd("echo \"Deadzone rulez!\"");
+    i_engine->pfnClientCmd("echo \"https://git.deadzone.lol/Wizzard/goldsource-cheat\"");
+
+
+    GameType game = get_current_game();
+    switch(game) {
+        case GAME_HALFLIFE:
+            i_engine->pfnClientCmd("echo \"Detected Game: Half-Life 1\"");
+            break;
+        case GAME_CS16:
+            i_engine->pfnClientCmd("echo \"Detected Game: Counter-Strike 1.6\"");
+            break;
+        case GAME_DAY_OF_DEFEAT:
+            i_engine->pfnClientCmd("echo \"Detected Game: Day of Defeat\"");
+            break;
+        case GAME_TFC:
+            i_engine->pfnClientCmd("echo \"Detected Game: Team Fortress Classic\"");
+            break;
+        default:
+            i_engine->pfnClientCmd("echo \"Detected Game: Unknown Game\"");
+            break;
+    }
+
+
+    return;
+    
+
 
     loaded = true;
 }
