@@ -46,19 +46,19 @@ attacking if there is no visible target.
 
 #+begin_quote
 *Note:* Chams color can be changed from the =h_glColor4f()= function inside
-[[https://github.com/8dcc/hl-cheat/blob/main/src/hooks.c][src/hooks.c]]. Since this cheat is not hard to compile, I rather have less
+[[https://github.com/8dcc/goldsource-cheat/blob/main/src/hooks.c][src/hooks.c]]. Since this cheat is not hard to compile, I rather have less
 console variables than more customization at runtime.
 #+end_quote
 
 #+begin_quote
 *Note:* Bullet tracer color, width and time can be changed at the bottom of the
-=bullet_tracers()= function inside [[https://github.com/8dcc/hl-cheat/blob/main/src/features/misc.c][src/features/misc.c]]. See previous chams note.
+=bullet_tracers()= function inside [[https://github.com/8dcc/goldsource-cheat/blob/main/src/features/misc.c][src/features/misc.c]]. See previous chams note.
 #+end_quote
 
 * Building
 #+begin_src console
-$ git clone --recurse-submodules https://github.com/8dcc/hl-cheat
-$ cd hl-cheat
+$ git clone --recurse-submodules https://github.com/8dcc/goldsource-cheat
+$ cd goldsource-cheat
 $ make
 ...
 #+end_src
@@ -67,7 +67,7 @@ Note that you will need to clone with =--recurse-submodules= for the sdk. If you
 have already cloned it, you can just:
 
 #+begin_src console
-$ cd hl-cheat
+$ cd goldsource-cheat
 $ git submodule update --init --recursive
 #+end_src
 
@@ -80,5 +80,5 @@ $ ./injector.sh
 
 ...
 
-hl-cheat loaded!
+goldsource-cheat loaded!
 #+end_src

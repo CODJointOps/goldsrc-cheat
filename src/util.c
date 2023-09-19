@@ -271,7 +271,7 @@ bool protect_addr(void* ptr, int new_flags) {
     int pgsz = getpagesize();
 
     if (mprotect(p, pgsz, new_flags) == -1) {
-        printf("hl-cheat: error protecting %p\n", ptr);
+        printf("goldsource-cheat: error protecting %p\n", ptr);
         return false;
     }
 

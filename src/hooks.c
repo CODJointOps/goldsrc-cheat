@@ -74,8 +74,10 @@ void h_CL_CreateMove(float frametime, usercmd_t* cmd, int active) {
 int h_HUD_Redraw(float time, int intermission) {
     int ret = ORIGINAL(HUD_Redraw, time, intermission);
 
-    /* Watermark */
-    engine_draw_text(5, 5, "8dcc/hl-cheat", (rgb_t){ 255, 255, 255 });
+    if (cv_watermark->value) {
+        /* Watermark */
+        engine_draw_text(5, 5, "https://git.deadzone.lol/Wizzard/goldsource-cheat", (rgb_t){ 0, 255, 255 });
+    }
 
     esp();
     custom_crosshair();

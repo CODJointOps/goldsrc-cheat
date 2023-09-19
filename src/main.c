@@ -13,25 +13,25 @@ static bool loaded = false;
 
 __attribute__((constructor)) /* Entry point when injected */
 void load(void) {
-    printf("hl-cheat injected!\n");
+    printf("goldsource-cheat injected!\n");
 
     /* Initialize globals/interfaces */
     if (!globals_init()) {
-        fprintf(stderr, "hl-cheat: load: error loading globals, aborting\n");
+        fprintf(stderr, "goldsource-cheat: load: error loading globals, aborting\n");
         self_unload();
         return;
     }
 
     /* Create cvars for settings */
     if (!cvars_init()) {
-        fprintf(stderr, "hl-cheat: load: error creating cvars, aborting\n");
+        fprintf(stderr, "goldsource-cheat: load: error creating cvars, aborting\n");
         self_unload();
         return;
     }
 
     /* Hook functions */
     if (!hooks_init()) {
-        fprintf(stderr, "hl-cheat: load: error hooking functions, aborting\n");
+        fprintf(stderr, "goldsource-cheat: load: error hooking functions, aborting\n");
         self_unload();
         return;
     }
@@ -39,7 +39,7 @@ void load(void) {
     /* Get game version after injecting */
     this_game_id = get_cur_game();
 
-    i_engine->pfnClientCmd("echo \"hl-cheat loaded successfully!\"");
+    i_engine->pfnClientCmd("echo \"goldsource-cheat loaded successfully!\"");
 
     loaded = true;
 }
@@ -55,7 +55,7 @@ void unload(void) {
         GL_UNHOOK(glColor4f); /* Manually restore OpenGL hooks here */
     }
 
-    printf("hl-cheat unloaded.\n\n");
+    printf("goldsource-cheat unloaded.\n\n");
 }
 
 void self_unload(void) {

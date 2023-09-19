@@ -42,13 +42,13 @@ bool globals_init(void) {
      */
     hw = dlopen("hw.so", RTLD_LAZY | RTLD_NOLOAD);
     if (!hw) {
-        printf("hl-cheat: globals_init: can't open hw.so\n");
+        printf("goldsource-cheat: globals_init: can't open hw.so\n");
         return false;
     }
 
     h_client = (void**)dlsym(hw, "hClientDLL");
     if (!h_client) {
-        printf("hl-cheat: globals_init: can't find hClientDLL\n");
+        printf("goldsource-cheat: globals_init: can't find hClientDLL\n");
         return false;
     }
 
@@ -67,12 +67,12 @@ bool globals_init(void) {
 
     if (!i_engine || !i_client || !i_pmove || !i_enginestudio ||
         !i_studiomodelrenderer || !game_info) {
-        printf("hl-cheat: globals_init: couldn't load some symbols\n");
+        printf("goldsource-cheat: globals_init: couldn't load some symbols\n");
         return false;
     }
 
     if (!protect_addr(i_studiomodelrenderer, PROT_READ | PROT_WRITE)) {
-        printf("hl-cheat: globals_init: couldn't unprotect address of SMR\n");
+        printf("goldsource-cheat: globals_init: couldn't unprotect address of SMR\n");
         return false;
     }
 
