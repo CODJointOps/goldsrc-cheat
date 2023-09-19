@@ -13,6 +13,7 @@ DECL_CVAR(crosshair);
 DECL_CVAR(tracers);
 DECL_CVAR(clmove);
 DECL_CVAR(watermark);
+DECL_CVAR(watermark_rainbow);
 
 bool cvars_init(void) {
     REGISTER_CVAR(bhop, 1);
@@ -25,6 +26,7 @@ bool cvars_init(void) {
     REGISTER_CVAR(tracers, 1);
     REGISTER_CVAR(clmove, 0);
     REGISTER_CVAR(watermark, 1);
+    REGISTER_CVAR(watermark_rainbow, 1);
 
     return true;
 }

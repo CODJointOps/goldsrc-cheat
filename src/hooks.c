@@ -71,12 +71,31 @@ void h_CL_CreateMove(float frametime, usercmd_t* cmd, int active) {
 
 /*----------------------------------------------------------------------------*/
 
+rgb_t rainbow_color(float time) {
+    const float frequency = 0.1f;
+
+    unsigned char r = (sin(frequency * time + 0) * 127.5f + 127.5f);
+    unsigned char g = (sin(frequency * time + 2.0f) * 127.5f + 127.5f);
+    unsigned char b = (sin(frequency * time + 4.0f) * 127.5f + 127.5f);
+
+    return (rgb_t){ r, g, b };
+}
+
 int h_HUD_Redraw(float time, int intermission) {
     int ret = ORIGINAL(HUD_Redraw, time, intermission);
 
     if (dz_watermark->value) {
+        /* Determine the color for the watermark */
+        rgb_t color;
+
+        if (dz_watermark_rainbow->value) {
+            color = rainbow_color(time);
+        } else {
+            color = (rgb_t){ 0, 255, 255 }; // default color
+        }
+
         /* Watermark */
-        engine_draw_text(5, 5, "https://git.deadzone.lol/Wizzard/goldsource-cheat", (rgb_t){ 0, 255, 255 });
+        engine_draw_text(5, 5, "https://git.deadzone.lol/Wizzard/goldsource-cheat", color);
     }
 
     esp();

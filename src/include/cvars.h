@@ -40,6 +40,7 @@ DECL_CVAR_EXTERN(crosshair);
 DECL_CVAR_EXTERN(tracers);
 DECL_CVAR_EXTERN(clmove);
 DECL_CVAR_EXTERN(watermark);
+DECL_CVAR_EXTERN(watermark_rainbow);
 
 /*----------------------------------------------------------------------------*/
 
