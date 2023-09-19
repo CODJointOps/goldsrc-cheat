@@ -55,6 +55,10 @@ console variables than more customization at runtime.
 =bullet_tracers()= function inside [[https://git.deadzone.lol/Wizzard/goldsource-cheat/src/branch/main/src/features/misc.c][src/features/misc.c]]. See previous chams note.
 #+end_quote
 
+#+begin_quote
+*Note:* You can disable the watermark with dz_watermark 0
+#+end_quote
+
 * Building
 #+begin_src console
 $ git clone --recurse-submodules https://git.deadzone.lol/Wizzard/goldsource-cheat
