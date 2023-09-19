@@ -108,6 +108,8 @@ void h_HUD_PostRunCmd(struct local_state_s* from, struct local_state_s* to,
                       unsigned int random_seed) {
     ORIGINAL(HUD_PostRunCmd, from, to, cmd, runfuncs, time, random_seed);
 
+    g_flCurrentTime = time;
+
     /* Store attack information to check if we can shoot */
     if (runfuncs) {
         g_flNextAttack = to->client.m_flNextAttack;

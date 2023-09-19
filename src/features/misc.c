@@ -4,6 +4,7 @@
 #include "../include/globals.h"
 #include "../include/cvars.h"
 #include "../include/util.h"
+#include "../include/game_detection.h"
 
 void custom_crosshair(void) {
     if (!CVAR_ON(crosshair))
@@ -30,17 +31,26 @@ void custom_crosshair(void) {
     gl_drawline(mx + gap, my + gap, mx + gap + len, my + gap + len, w, col);
 }
 
+weapon_data_t g_currentWeapon;
+static double lastTracerTime = 0;
+    
 void bullet_tracers(usercmd_t* cmd) {
     /* Only draw if we are holding attack and we can shoot */
-    if (!CVAR_ON(tracers) || !(cmd->buttons & IN_ATTACK) || !can_shoot() ||
-        !is_alive(localplayer))
+    if (!CVAR_ON(tracers) || !(cmd->buttons & IN_ATTACK) || !can_shoot() || !is_alive(localplayer))
         return;
+    /* Dirty temp fix for tracers being spammed in CS1.6 */
+    if (IsCS16() && (g_flCurrentTime - lastTracerTime < 0.5)) {
+        return;
+    }
+
+    if (IsCS16()) {
+    }
 
     /* Get player eye pos, start of tracer */
     vec3_t view_height;
     i_engine->pEventAPI->EV_LocalPlayerViewheight(view_height);
     vec3_t local_eyes = vec_add(localplayer->origin, view_height);
-
+    
     /* Get forward vector from viewangles */
     vec3_t fwd;
     i_engine->pfnAngleVectors(cmd->viewangles, fwd, NULL, NULL);
@@ -55,4 +65,6 @@ void bullet_tracers(usercmd_t* cmd) {
     const float w    = 0.8;
     const float time = 2;
     draw_tracer(local_eyes, end, (rgb_t){ 66, 165, 245 }, 1, w, time);
+    lastTracerTime = g_flCurrentTime;
 }
+

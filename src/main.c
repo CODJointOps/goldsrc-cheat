@@ -38,7 +38,7 @@ void load(void) {
     }
 
     /* Get game version after injecting */
-    this_game_id = get_cur_game();
+    //this_game_id = get_cur_game();
 
     i_engine->pfnClientCmd("echo \"goldsource-cheat loaded successfully!\"");
     i_engine->pfnClientCmd("echo \"Deadzone rulez!\"");
@@ -64,10 +64,7 @@ void load(void) {
             break;
     }
 
-
     return;
-    
-
 
     loaded = true;
 }
