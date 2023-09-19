@@ -25,14 +25,14 @@ Also make sure to check out [[https://github.com/deboogerxyz/ahc][deboogerxyz/ah
 
 | Feature    | Command       | Values (0..n)          |
 |------------+---------------+------------------------|
-| Bhop       | =cv_bhop=       | off/on                 |
-| Autostrafe | =cv_autostrafe= | off/rage/legit         |
-| Aimbot     | =cv_aimbot=     | off/fov*               |
-| Autoshoot  | =cv_autoshoot=  | off/on*                |
-| ESP        | =cv_esp=        | off/3d-box/name/all    |
-| Chams      | =cv_chams=      | off/players/hands/all* |
-| Crosshair  | =cv_crosshair=  | off/length             |
-| Tracers    | =cv_tracers=    | off/on*                |
+| Bhop       | =dz_bhop=       | off/on                 |
+| Autostrafe | =dz_autostrafe= | off/rage/legit         |
+| Aimbot     | =dz_aimbot=     | off/fov*               |
+| Autoshoot  | =dz_autoshoot=  | off/on*                |
+| ESP        | =dz_esp=        | off/3d-box/name/all    |
+| Chams      | =dz_chams=      | off/players/hands/all* |
+| Crosshair  | =dz_crosshair=  | off/length             |
+| Tracers    | =dz_tracers=    | off/on*                |
 
 
 #+begin_quote
@@ -40,7 +40,7 @@ Also make sure to check out [[https://github.com/deboogerxyz/ahc][deboogerxyz/ah
 #+end_quote
 
 #+begin_quote
-*Note:* If =cv_autoshoot= is enabled, and =cv_aimbot= is enabled, it will stop
+*Note:* If =dz_autoshoot= is enabled, and =dz_aimbot= is enabled, it will stop
 attacking if there is no visible target.
 #+end_quote
 

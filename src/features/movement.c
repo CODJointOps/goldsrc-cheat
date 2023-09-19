@@ -82,7 +82,7 @@ void bhop(usercmd_t* cmd) {
 
     /* Autostrafe if enabled. Check if we are in the air and holding space. */
     if (is_jumping) {
-        switch ((int)cv_autostrafe->value) {
+        switch ((int)dz_autostrafe->value) {
             case 1:
                 autostrafe_rage(cmd);
                 break;

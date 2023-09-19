@@ -5,7 +5,7 @@
 #include "sdk.h"
 #include "globals.h"
 
-#define CVAR_PREFIX  "cv_"
+#define CVAR_PREFIX  "dz_"
 #define CVAR_HACK_ID 0x4000 /* (1<<14) One that is not in use by the game */
 
 /*
@@ -16,17 +16,17 @@
  *
  * prefix | meaning
  * -------+-------------------------------
- * cv_*   | cvar variable
+ * dz_*   | cvar variable
  */
-#define DECL_CVAR(name) cvar_t* cv_##name = NULL;
+#define DECL_CVAR(name) cvar_t* dz_##name = NULL;
 
-#define DECL_CVAR_EXTERN(name) extern cvar_t* cv_##name;
+#define DECL_CVAR_EXTERN(name) extern cvar_t* dz_##name;
 
 #define REGISTER_CVAR(name, value) \
-    cv_##name =                    \
+    dz_##name =                    \
       i_engine->pfnRegisterVariable(CVAR_PREFIX #name, #value, CVAR_HACK_ID);
 
-#define CVAR_ON(name) (cv_##name->value != 0.0f)
+#define CVAR_ON(name) (dz_##name->value != 0.0f)
 
 /*----------------------------------------------------------------------------*/
 

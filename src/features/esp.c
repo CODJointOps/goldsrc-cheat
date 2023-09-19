@@ -5,7 +5,7 @@
 #include "../include/cvars.h"
 #include "../include/util.h"
 
-/* For cv_esp */
+/* For dz_esp */
 enum esp_values {
     ESP_OFF  = 0,
     ESP_BOX  = 1,
@@ -98,7 +98,7 @@ static bool gl_draw2dbox(vec3_t o, int bh) {
 }
 
 void esp(void) {
-    const int setting = (int)cv_esp->value;
+    const int setting = (int)dz_esp->value;
     if (setting == ESP_OFF)
         return;
 

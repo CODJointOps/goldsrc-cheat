@@ -74,7 +74,7 @@ void h_CL_CreateMove(float frametime, usercmd_t* cmd, int active) {
 int h_HUD_Redraw(float time, int intermission) {
     int ret = ORIGINAL(HUD_Redraw, time, intermission);
 
-    if (cv_watermark->value) {
+    if (dz_watermark->value) {
         /* Watermark */
         engine_draw_text(5, 5, "https://git.deadzone.lol/Wizzard/goldsource-cheat", (rgb_t){ 0, 255, 255 });
     }
@@ -164,8 +164,8 @@ void h_glColor4f(GLfloat r, GLfloat g, GLfloat b, GLfloat a) {
 /*----------------------------------------------------------------------------*/
 
 void h_CL_Move() {
-    if (cv_clmove->value != 0) {
-        for (int i = 0; i < (int)cv_clmove->value; i++)
+    if (dz_clmove->value != 0) {
+        for (int i = 0; i < (int)dz_clmove->value; i++)
             CALL_ORIGINAL(detour_data_clmove, clmove_type);
     }
 

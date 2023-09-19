@@ -15,7 +15,7 @@ enum chams_settings {
 visible_flags visible_mode;
 
 bool chams(void* this_ptr) {
-    const int setting = cv_chams->value == 5.0f ? 7 : cv_chams->value;
+    const int setting = dz_chams->value == 5.0f ? 7 : dz_chams->value;
     if (setting == DISABLED)
         return false;
 

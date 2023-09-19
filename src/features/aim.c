@@ -42,7 +42,7 @@ static vec3_t get_closest_delta(vec3_t viewangles) {
 
     /* These 2 vars are used to store the best target across iterations.
      * NOTE: The default value of best_fov will be the aimbot fov */
-    float best_fov    = cv_aimbot->value;
+    float best_fov    = dz_aimbot->value;
     vec3_t best_delta = { 0, 0, 0 };
 
     for (int i = 1; i <= i_engine->GetMaxClients(); i++) {
