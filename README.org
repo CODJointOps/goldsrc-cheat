@@ -27,7 +27,7 @@ Also make sure to check out [[https://github.com/deboogerxyz/ahc][deboogerxyz/ah
 | Feature    | Command                | Values                |
 |------------|------------------------|-----------------------|
 | Bhop       | =dz_movement_bhop=     | off/on                |
-| Autostrafe | =dz_movement_autostrafe| off/rage/legit        |
+| Autostrafe | =dz_movement_autostrafe= | off/rage/legit        |
 | Aimbot     | =dz_aim_aimbot=        | off/fov               |
 | Autoshoot  | =dz_aim_autoshoot=     | off/on                |
 | ESP        | =dz_visuals_esp=       | off/3d-box/name/all   |
