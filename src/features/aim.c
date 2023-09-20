@@ -1,5 +1,6 @@
 
 #include <math.h>
+#include <cfloat>
 
 #include "features.h"
 #include "../include/sdk.h"
@@ -12,26 +13,20 @@
 /* Scale factor for aim punch */
 #define AIM_PUNCH_MULT 2
 
+static float vec_length(vec3_t v) {
+    return sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+
 static bool is_visible(vec3_t start, vec3_t end) {
-    /* Syntax: PM_TraceLine(start, end, flags, usehulll, ignore_pe); */
-    pmtrace_t* tr =
-      i_engine->PM_TraceLine(start, end, PM_TRACELINE_PHYSENTSONLY, 2, -1);
-
-    /* We didn't hit a valid entity */
-    if (tr->ent <= 0)
-        return false;
-
-    /* Get entity index from physents, check if we can't get a valid player */
+    pmtrace_t* tr = i_engine->PM_TraceLine(start, end, PM_TRACELINE_PHYSENTSONLY, 2, -1);
+    if (tr->ent <= 0) return false;
     const int ent_idx = i_pmove->physents[tr->ent].info;
-    if (!get_player(ent_idx))
-        return false;
-
-    /* We hit a valid player */
-    return true;
+    return get_player(ent_idx) != NULL;
 }
 
 static vec3_t get_closest_delta(vec3_t viewangles) {
-    /* Compensate aim punch. We get g_punchAngles from CalcRefdef hook */
+    // Compensate for aim punch
     viewangles.x += g_punchAngles.x * AIM_PUNCH_MULT;
     viewangles.y += g_punchAngles.y * AIM_PUNCH_MULT;
     viewangles.z += g_punchAngles.z * AIM_PUNCH_MULT;
@@ -40,38 +35,44 @@ static vec3_t get_closest_delta(vec3_t viewangles) {
     i_engine->pEventAPI->EV_LocalPlayerViewheight(view_height);
     vec3_t local_eyes = vec_add(localplayer->origin, view_height);
 
-    /* These 2 vars are used to store the best target across iterations.
-     * NOTE: The default value of best_fov will be the aimbot fov */
-    float best_fov    = dz_aimbot->value;
+    float min_distance = FLT_MAX;  // For tracking the closest player
+    float best_fov = dz_aimbot->value;
     vec3_t best_delta = { 0, 0, 0 };
 
     for (int i = 1; i <= i_engine->GetMaxClients(); i++) {
         cl_entity_t* ent = get_player(i);
 
-        if (!is_alive(ent) || is_friend(ent))
-            continue;
+        if (!is_alive(ent) || is_friend(ent)) {
+            continue; // Skip if not alive or is a friend
+        }
 
-        /* TODO: Get bones origin instead of calculating from ent origin */
         vec3_t head_pos = ent->origin;
-        if (ent->curstate.usehull != 1) /* Get head if not crouched */
+        if (ent->curstate.usehull != 1) { // Get head if not crouched
             head_pos.z += HEAD_OFFSET;
+        }
 
-        if (!is_visible(local_eyes, head_pos)) /* We can't see player */
-            continue;
+        float distance = vec_length(vec_sub(ent->origin, local_eyes));
+        if (distance > min_distance) {
+            continue; // Skip players that are further than the current closest target
+        }
 
         const vec3_t enemy_angle = vec_to_ang(vec_sub(head_pos, local_eyes));
-        const vec3_t delta       = vec_sub(enemy_angle, viewangles);
+        const vec3_t delta = vec_sub(enemy_angle, viewangles);
         vec_norm(delta);
 
         float fov = hypotf(delta.x, delta.y);
-        if (fov > 360.0f)
+        if (fov > 360.0f) {
             fov = remainderf(fov, 360.0f);
-        if (fov > 180.0f)
+        }
+        if (fov > 180.0f) {
             fov = 360.0f - fov;
+        }
 
-        if (fov < best_fov) {
+        // Only check visibility for potential targets
+        if (fov < best_fov && is_visible(local_eyes, head_pos)) {
             best_fov = fov;
             vec_copy(best_delta, delta);
+            min_distance = distance;  // Update the closest target's distance
         }
     }
 
