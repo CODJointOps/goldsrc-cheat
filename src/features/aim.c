@@ -90,8 +90,6 @@ void aimbot(usercmd_t* cmd) {
     /* TODO: Add setting for lowest health */
     vec3_t best_delta = get_closest_delta(engine_viewangles);
     if (!vec_is_zero(best_delta)) {
-        /* NOTE: We can divide the best delta here to add smoothing */
-
         engine_viewangles.x += best_delta.x;
         engine_viewangles.y += best_delta.y;
         engine_viewangles.z += best_delta.z;
@@ -100,8 +98,10 @@ void aimbot(usercmd_t* cmd) {
         cmd->buttons &= ~IN_ATTACK;
     }
 
-    vec_copy(cmd->viewangles, engine_viewangles);
-
-    /* NOTE: Uncomment to disable silent aim */
-    /* i_engine->SetViewAngles(engine_viewangles); */
+    if (CVAR_ON(silent_aim)) {
+        vec_copy(cmd->viewangles, engine_viewangles);
+    } else {
+        i_engine->SetViewAngles(engine_viewangles);
+    }
 }
+

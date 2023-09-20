@@ -15,6 +15,7 @@ DECL_CVAR(tracers);
 DECL_CVAR(clmove);
 DECL_CVAR(watermark);
 DECL_CVAR(watermark_rainbow);
+DECL_CVAR(silent_aim);
 
 bool cvars_init(void) {
     REGISTER_CVAR(bhop, 1);
@@ -27,6 +28,7 @@ bool cvars_init(void) {
     REGISTER_CVAR(clmove, 0);
     REGISTER_CVAR(watermark, 1);
     REGISTER_CVAR(watermark_rainbow, 1);
+    REGISTER_CVAR(silent_aim, 1);
     if (IsCS16()) {
     REGISTER_CVAR(tracers, 0);
     } else {
