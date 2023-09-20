@@ -1,4 +1,4 @@
-#+title: Half-Life cheat (Original arthur: [[https://github.com/8dcc/][8dcc]])
+#+title: Half-Life cheat (Original author: [[https://github.com/8dcc/][8dcc]])
 #+options: toc:nil
 #+startup: showeverything
 #+author: Wizzard
