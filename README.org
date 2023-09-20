@@ -1,7 +1,7 @@
-#+title: Half-Life cheat
+#+title: Half-Life cheat (Original arthur: [[https://github.com/8dcc/][8dcc]])
 #+options: toc:nil
 #+startup: showeverything
-#+author: Wizzard (Original arthur: [[https://github.com/8dcc/][8dcc]])
+#+author: Wizzard
 
 *Linux cheat for goldsrc games.*
 
