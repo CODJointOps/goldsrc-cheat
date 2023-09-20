@@ -1,4 +1,3 @@
-
 #include <math.h>
 #include <cfloat>
 
@@ -6,9 +5,12 @@
 #include "../include/sdk.h"
 #include "../include/cvars.h"
 #include "../include/util.h"
+#include "../include/game_detection.h"
 
 /* Game units to add to the entity origin to get the head */
-#define HEAD_OFFSET 25.f
+#define HL1_HEAD_OFFSET 25.f
+#define CS16_HEAD_OFFSET 23.f
+#define CS16_HORIZONTAL_OFFSET 5.0f
 
 /* Scale factor for aim punch */
 #define AIM_PUNCH_MULT 2
@@ -47,10 +49,18 @@ static vec3_t get_closest_delta(vec3_t viewangles) {
         }
 
         vec3_t head_pos = ent->origin;
-        if (ent->curstate.usehull != 1) { // Get head if not crouched
-            head_pos.z += HEAD_OFFSET;
+
+        if (ent->curstate.usehull != 1) {  // Not crouched
+            if (IsCS16()) {
+                head_pos.z += CS16_HEAD_OFFSET;
+                head_pos.x += CS16_HORIZONTAL_OFFSET;  // Adjust based on observation; might be negative.
+            } else {
+                head_pos.z += HL1_HEAD_OFFSET;
+            }
         }
 
+
+        
         float distance = vec_length(vec_sub(ent->origin, local_eyes));
         if (distance > min_distance) {
             continue; // Skip players that are further than the current closest target
@@ -83,25 +93,28 @@ void aimbot(usercmd_t* cmd) {
     if (!CVAR_ON(aim_aimbot) || !(cmd->buttons & IN_ATTACK) || !can_shoot())
         return;
 
-    /* Calculate delta with the engine viewangles, not with the cmd ones */
     vec3_t engine_viewangles;
     i_engine->GetViewAngles(engine_viewangles);
 
-    /* TODO: Add setting for lowest health */
     vec3_t best_delta = get_closest_delta(engine_viewangles);
     if (!vec_is_zero(best_delta)) {
         engine_viewangles.x += best_delta.x;
         engine_viewangles.y += best_delta.y;
         engine_viewangles.z += best_delta.z;
+        
+        if (CVAR_ON(aim_aimbot_silent)) {
+            vec_copy(cmd->viewangles, engine_viewangles);
+        } else {
+            vec_copy(cmd->viewangles, engine_viewangles);
+            i_engine->SetViewAngles(engine_viewangles);
+        }
     } else if (CVAR_ON(aim_autoshoot)) {
-        /* No valid target and we have autoshoot, don't shoot */
         cmd->buttons &= ~IN_ATTACK;
     }
-
-    if (CVAR_ON(aim_aimbot_silent)) {
-        vec_copy(cmd->viewangles, engine_viewangles);
-    } else {
-        i_engine->SetViewAngles(engine_viewangles);
-    }
 }
+
+
+
+
+
 
