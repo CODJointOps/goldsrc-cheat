@@ -15,6 +15,7 @@ Supported games:
 - [[https://store.steampowered.com/app/10/CounterStrike/][Counter-Strike 1.6]]
 - [[https://store.steampowered.com/app/20/Team_Fortress_Classic/][Team Fortress Classic]]
 - [[https://store.steampowered.com/app/30/Day_of_Defeat/][Day of Defeat]]
+- [[https://store.steampowered.com/app/40/Deathmatch_Classic/][Deathmatch Classic]]
 
 This project was heavily inspired by [[https://github.com/UnkwUsr/hlhax][UnkwUsr/hlhax]], and would not have been
 possible without his help. Make sure to check out his repo too.

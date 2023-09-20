@@ -49,6 +49,9 @@ void load(void) {
     else if (IsTFC()) {
         i_engine->pfnClientCmd("play 'sound/misc/party2.wav'");
     }
+    else if (IsDeathmatchClassic()) {
+        i_engine->pfnClientCmd("play 'sound/items/suit.wav'");
+    }
     else
     {
         i_engine->pfnClientCmd("play 'valve/sound/vox/suit.wav'");
@@ -72,6 +75,9 @@ void load(void) {
             break;
         case GAME_TFC:
             i_engine->pfnClientCmd("echo \"Detected Game: Team Fortress Classic\"");
+            break;
+        case GAME_DMC:
+            i_engine->pfnClientCmd("echo \"Detected Game: Deathmatch Classic\"");
             break;
         default:
             i_engine->pfnClientCmd("echo \"Detected Game: Unknown Game\"");

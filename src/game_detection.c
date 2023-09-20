@@ -38,6 +38,8 @@ GameType get_current_game(void) {
                     current_game = GAME_CS16;
                 } else if (strcmp(gameTypeToken, "dod") == 0) {
                     current_game = GAME_DAY_OF_DEFEAT;
+                } else if (strcmp(gameTypeToken, "dmc") == 0) {
+                    current_game = GAME_DMC;    
                 } else if (strcmp(gameTypeToken, "tfc") == 0) {
                     current_game = GAME_TFC;
                 }
@@ -65,4 +67,8 @@ int IsDayOfDefeat(void) {
 
 int IsTFC(void) {
     return get_current_game() == GAME_TFC;
+}
+
+int IsDeathmatchClassic(void) {
+    return get_current_game() == GAME_DMC;
 }
