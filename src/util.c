@@ -9,6 +9,7 @@
 #include "include/util.h"
 #include "include/sdk.h"
 #include "include/globals.h"
+#include "include/game_detection.h"
 
 cl_entity_t* get_player(int ent_idx) {
     if (ent_idx < 0 || ent_idx > 32)
@@ -35,29 +36,23 @@ bool is_friend(cl_entity_t* ent) {
     if (!ent)
         return false;
 
-    /* Check the current game because this method only works for some games */
-    switch (this_game_id) {
-        case TF: {
+    GameType game = get_current_game();
+    
+    switch (game) {
+        case GAME_TFC: {
             extra_player_info_t* info = (extra_player_info_t*)player_extra_info;
-
-            return info[ent->index].teamnumber ==
-                   info[localplayer->index].teamnumber;
+            return info[ent->index].teamnumber == info[localplayer->index].teamnumber;
         }
-        case CS: {
-            extra_player_info_cs_t* info =
-              (extra_player_info_cs_t*)player_extra_info;
-
-            return info[ent->index].teamnumber ==
-                   info[localplayer->index].teamnumber;
+        case GAME_CS16: {
+            extra_player_info_cs_t* info = (extra_player_info_cs_t*)player_extra_info;
+            return info[ent->index].teamnumber == info[localplayer->index].teamnumber;
         }
-        case DOD: {
-            extra_player_info_dod_t* info =
-              (extra_player_info_dod_t*)player_extra_info;
-
-            return info[ent->index].teamnumber ==
-                   info[localplayer->index].teamnumber;
+        case GAME_DAY_OF_DEFEAT: {
+            extra_player_info_dod_t* info = (extra_player_info_dod_t*)player_extra_info;
+            return info[ent->index].teamnumber == info[localplayer->index].teamnumber;
         }
-        case HL:
+        case GAME_HALFLIFE:
+        case GAME_DMC:
         default:
             return false;
     }
