@@ -38,7 +38,6 @@ void load(void) {
     }
 
     /* Get game version after injecting */
-    //this_game_id = get_cur_game();
 
     if (IsCS16()) {
         i_engine->pfnClientCmd("play 'sound/radio/go.wav'");

@@ -70,26 +70,6 @@ char* get_name(int ent_idx) {
     return info.name;
 }
 
-game_id get_cur_game(void) {
-    typedef void (*COM_ParseDirectoryFromCmd_t)(const char*, char*, int,
-                                                const char*);
-    COM_ParseDirectoryFromCmd_t COM_ParseDirectoryFromCmd =
-      (COM_ParseDirectoryFromCmd_t)dlsym(hw, "COM_ParseDirectoryFromCmd");
-
-    char game[FILENAME_MAX];
-    COM_ParseDirectoryFromCmd("-game", game, sizeof(game), "valve");
-
-    /* Get the current game we are playing */
-    if (game[0] == 'c' && game[1] == 's') /* cstrike */
-        return CS;
-    else if (*game == 'd') /* dod */
-        return DOD;
-    else if (*game == 't') /* tfc */
-        return TF;
-    else
-        return HL;
-}
-
 vec3_t vec3(float x, float y, float z) {
     vec3_t ret;
 
