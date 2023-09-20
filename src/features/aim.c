@@ -98,7 +98,7 @@ void aimbot(usercmd_t* cmd) {
         cmd->buttons &= ~IN_ATTACK;
     }
 
-    if (CVAR_ON(silent_aim)) {
+    if (CVAR_ON(aimbot_silent_aim)) {
         vec_copy(cmd->viewangles, engine_viewangles);
     } else {
         i_engine->SetViewAngles(engine_viewangles);
