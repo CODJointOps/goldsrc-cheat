@@ -4,35 +4,38 @@
 #include "include/globals.h"
 #include "include/game_detection.h"
 
-DECL_CVAR(bhop);
-DECL_CVAR(autostrafe);
-DECL_CVAR(aimbot);
-DECL_CVAR(autoshoot);
-DECL_CVAR(esp);
-DECL_CVAR(chams);
-DECL_CVAR(crosshair);
-DECL_CVAR(tracers);
-DECL_CVAR(clmove);
+DECL_CVAR(movement_bhop);
+DECL_CVAR(movement_autostrafe);
+DECL_CVAR(aim_aimbot);
+DECL_CVAR(aim_autoshoot);
+DECL_CVAR(visuals_esp);
+DECL_CVAR(visuals_chams);
+DECL_CVAR(visuals_crosshair);
+DECL_CVAR(visuals_tracers);
+DECL_CVAR(movement_clmove);
 DECL_CVAR(watermark);
 DECL_CVAR(watermark_rainbow);
-DECL_CVAR(aimbot_silent_aim);
+DECL_CVAR(aim_aimbot_silent);
+DECL_CVAR(visuals_friendly);
+
 
 bool cvars_init(void) {
-    REGISTER_CVAR(bhop, 1);
-    REGISTER_CVAR(autostrafe, 1);
-    REGISTER_CVAR(aimbot, 0);
-    REGISTER_CVAR(autoshoot, 0); /* Only works with aimbot enabled */
-    REGISTER_CVAR(esp, 3);
-    REGISTER_CVAR(chams, 1);
-    REGISTER_CVAR(crosshair, 0);
-    REGISTER_CVAR(clmove, 0);
+    REGISTER_CVAR(movement_bhop, 1);
+    REGISTER_CVAR(movement_autostrafe, 1);
+    REGISTER_CVAR(aim_aimbot, 0);
+    REGISTER_CVAR(aim_autoshoot, 0); /* Only works with aimbot enabled */
+    REGISTER_CVAR(visuals_esp, 3);
+    REGISTER_CVAR(visuals_chams, 1);
+    REGISTER_CVAR(visuals_crosshair, 0);
+    REGISTER_CVAR(movement_clmove, 0);
     REGISTER_CVAR(watermark, 1);
     REGISTER_CVAR(watermark_rainbow, 1);
-    REGISTER_CVAR(aimbot_silent_aim, 1);
+    REGISTER_CVAR(aim_aimbot_silent, 1);
+    REGISTER_CVAR(visuals_friendly, 0);
     if (IsCS16()) {
-    REGISTER_CVAR(tracers, 0);
+    REGISTER_CVAR(visuals_tracers, 0);
     } else {
-    REGISTER_CVAR(tracers, 1);
+    REGISTER_CVAR(visuals_tracers, 1);
     }
     return true;
 }

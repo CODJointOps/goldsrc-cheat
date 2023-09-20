@@ -7,7 +7,7 @@
 #include "../include/game_detection.h"
 
 void custom_crosshair(void) {
-    if (!CVAR_ON(crosshair))
+    if (!CVAR_ON(visuals_crosshair))
         return;
 
     /* Get window size, and then the center. */
@@ -15,7 +15,7 @@ void custom_crosshair(void) {
     int my = game_info->m_height / 2;
 
     /* The real length is sqrt(2 * (len^2)) */
-    const int len   = dz_crosshair->value;
+    const int len   = dz_visuals_crosshair->value;
     const int gap   = 1;
     const float w   = 1;
     const rgb_t col = { 255, 255, 255 };
@@ -36,7 +36,7 @@ static double lastTracerTime = 0;
     
 void bullet_tracers(usercmd_t* cmd) {
     /* Only draw if we are holding attack and we can shoot */
-    if (!CVAR_ON(tracers) || !(cmd->buttons & IN_ATTACK) || !can_shoot() || !is_alive(localplayer))
+    if (!CVAR_ON(visuals_tracers) || !(cmd->buttons & IN_ATTACK) || !can_shoot() || !is_alive(localplayer))
         return;
     /* Dirty temp fix for tracers being spammed in CS1.6 */
     if (IsCS16() && (g_flCurrentTime - lastTracerTime < 0.5)) {

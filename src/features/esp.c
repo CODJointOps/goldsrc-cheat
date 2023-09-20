@@ -98,7 +98,7 @@ static bool gl_draw2dbox(vec3_t o, int bh) {
 }
 
 void esp(void) {
-    const int setting = (int)dz_esp->value;
+    const int setting = (int)dz_visuals_esp->value;
     if (setting == ESP_OFF)
         return;
 
@@ -107,6 +107,10 @@ void esp(void) {
         cl_entity_t* ent = get_player(i);
 
         if (!valid_player(ent) || !is_alive(ent) || vec_is_zero(ent->origin))
+            continue;
+
+        // Check if the player is friendly and if visuals_friendly is 0
+        if (is_friend(ent) && dz_visuals_friendly->value == 0)
             continue;
 
         const int bh = (ent->curstate.usehull == 1) ? 44 : 70;

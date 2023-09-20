@@ -185,8 +185,8 @@ void h_glColor4f(GLfloat r, GLfloat g, GLfloat b, GLfloat a) {
 /*----------------------------------------------------------------------------*/
 
 void h_CL_Move() {
-    if (dz_clmove->value != 0) {
-        for (int i = 0; i < (int)dz_clmove->value; i++)
+    if (dz_movement_clmove->value != 0) {
+        for (int i = 0; i < (int)dz_movement_clmove->value; i++)
             CALL_ORIGINAL(detour_data_clmove, clmove_type);
     }
 

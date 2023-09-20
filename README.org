@@ -24,17 +24,16 @@ Also make sure to check out [[https://github.com/deboogerxyz/ahc][deboogerxyz/ah
 
 * Features
 
-| Feature    | Command       | Values (0..n)          |
-|------------+---------------+------------------------|
-| Bhop       | =dz_bhop=       | off/on                 |
-| Autostrafe | =dz_autostrafe= | off/rage/legit         |
-| Aimbot     | =dz_aimbot=     | off/fov*               |
-| Autoshoot  | =dz_autoshoot=  | off/on*                |
-| ESP        | =dz_esp=        | off/3d-box/name/all    |
-| Chams      | =dz_chams=      | off/players/hands/all* |
-| Crosshair  | =dz_crosshair=  | off/length             |
-| Tracers    | =dz_tracers=    | off/on*                |
-
+| Feature    | Command                | Values                |
+|------------|------------------------|-----------------------|
+| Bhop       | =dz_movement_bhop=     | off/on                |
+| Autostrafe | =dz_movement_autostrafe| off/rage/legit        |
+| Aimbot     | =dz_aim_aimbot=        | off/fov               |
+| Autoshoot  | =dz_aim_autoshoot=     | off/on                |
+| ESP        | =dz_visuals_esp=       | off/3d-box/name/all   |
+| Chams      | =dz_visuals_chams=     | off/players/hands/all |
+| Crosshair  | =dz_visuals_crosshair= | off/length            |
+| Tracers    | =dz_visuals_tracers=   | off/on                |
 
 #+begin_quote
 *Note:* Aimbot FOV goes from 0 (off) to 180 (all enemies)

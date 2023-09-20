@@ -30,18 +30,20 @@
 
 /*----------------------------------------------------------------------------*/
 
-DECL_CVAR_EXTERN(bhop);
-DECL_CVAR_EXTERN(autostrafe);
-DECL_CVAR_EXTERN(aimbot);
-DECL_CVAR_EXTERN(autoshoot);
-DECL_CVAR_EXTERN(esp);
-DECL_CVAR_EXTERN(chams);
-DECL_CVAR_EXTERN(crosshair);
-DECL_CVAR_EXTERN(tracers);
-DECL_CVAR_EXTERN(clmove);
+DECL_CVAR_EXTERN(movement_bhop);
+DECL_CVAR_EXTERN(movement_autostrafe);
+DECL_CVAR_EXTERN(aim_aimbot);
+DECL_CVAR_EXTERN(aim_autoshoot);
+DECL_CVAR_EXTERN(visuals_esp);
+DECL_CVAR_EXTERN(visuals_chams);
+DECL_CVAR_EXTERN(visuals_crosshair);
+DECL_CVAR_EXTERN(visuals_tracers);
+DECL_CVAR_EXTERN(movement_clmove);
 DECL_CVAR_EXTERN(watermark);
 DECL_CVAR_EXTERN(watermark_rainbow);
-DECL_CVAR_EXTERN(aimbot_silent_aim);
+DECL_CVAR_EXTERN(aim_aimbot_silent);
+DECL_CVAR_EXTERN(visuals_friendly);
+
 
 /*----------------------------------------------------------------------------*/
 

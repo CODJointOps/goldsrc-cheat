@@ -36,7 +36,6 @@ bool valid_player(cl_entity_t* ent);
 bool is_friend(cl_entity_t* ent);
 bool can_shoot(void);
 char* get_name(int ent_idx);
-game_id get_cur_game(void);
 vec3_t vec3(float x, float y, float z);
 vec3_t vec_add(vec3_t a, vec3_t b);
 vec3_t vec_sub(vec3_t a, vec3_t b);

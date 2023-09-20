@@ -65,7 +65,7 @@ static void autostrafe_rage(usercmd_t* cmd) {
 }
 
 void bhop(usercmd_t* cmd) {
-    if (!CVAR_ON(bhop) || i_pmove->movetype != MOVETYPE_WALK)
+    if (!CVAR_ON(movement_bhop) || i_pmove->movetype != MOVETYPE_WALK)
         return;
 
     static bool was_in_air = false;
@@ -82,7 +82,7 @@ void bhop(usercmd_t* cmd) {
 
     /* Autostrafe if enabled. Check if we are in the air and holding space. */
     if (is_jumping) {
-        switch ((int)dz_autostrafe->value) {
+        switch ((int)dz_movement_autostrafe->value) {
             case 1:
                 autostrafe_rage(cmd);
                 break;

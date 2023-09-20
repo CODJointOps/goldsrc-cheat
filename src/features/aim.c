@@ -36,7 +36,7 @@ static vec3_t get_closest_delta(vec3_t viewangles) {
     vec3_t local_eyes = vec_add(localplayer->origin, view_height);
 
     float min_distance = FLT_MAX;  // For tracking the closest player
-    float best_fov = dz_aimbot->value;
+    float best_fov = dz_aim_aimbot->value;
     vec3_t best_delta = { 0, 0, 0 };
 
     for (int i = 1; i <= i_engine->GetMaxClients(); i++) {
@@ -80,7 +80,7 @@ static vec3_t get_closest_delta(vec3_t viewangles) {
 }
 
 void aimbot(usercmd_t* cmd) {
-    if (!CVAR_ON(aimbot) || !(cmd->buttons & IN_ATTACK) || !can_shoot())
+    if (!CVAR_ON(aim_aimbot) || !(cmd->buttons & IN_ATTACK) || !can_shoot())
         return;
 
     /* Calculate delta with the engine viewangles, not with the cmd ones */
@@ -93,12 +93,12 @@ void aimbot(usercmd_t* cmd) {
         engine_viewangles.x += best_delta.x;
         engine_viewangles.y += best_delta.y;
         engine_viewangles.z += best_delta.z;
-    } else if (CVAR_ON(autoshoot)) {
+    } else if (CVAR_ON(aim_autoshoot)) {
         /* No valid target and we have autoshoot, don't shoot */
         cmd->buttons &= ~IN_ATTACK;
     }
 
-    if (CVAR_ON(aimbot_silent_aim)) {
+    if (CVAR_ON(aim_aimbot_silent)) {
         vec_copy(cmd->viewangles, engine_viewangles);
     } else {
         i_engine->SetViewAngles(engine_viewangles);
