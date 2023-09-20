@@ -33,4 +33,7 @@ void aimbot(usercmd_t* cmd);
 void custom_crosshair(void);
 void bullet_tracers(usercmd_t* cmd);
 
+/* src/features/anti_aim.c */
+void anti_aim(usercmd_t* cmd);
+
 #endif /* FEATURES_H_ */

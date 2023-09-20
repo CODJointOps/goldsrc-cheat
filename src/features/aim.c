@@ -53,7 +53,7 @@ static vec3_t get_closest_delta(vec3_t viewangles) {
         if (ent->curstate.usehull != 1) {  // Not crouched
             if (IsCS16()) {
                 head_pos.z += CS16_HEAD_OFFSET;
-                head_pos.x += CS16_HORIZONTAL_OFFSET;  // Adjust based on observation; might be negative.
+                head_pos.x += CS16_HORIZONTAL_OFFSET;
             } else {
                 head_pos.z += HL1_HEAD_OFFSET;
             }
