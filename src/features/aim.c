@@ -90,7 +90,6 @@ static vec3_t get_closest_delta(vec3_t viewangles) {
 }
 
 void aimbot(usercmd_t* cmd) {
-    static bool shouldShootNextFrame = false;
     static bool hasAdjustedView = false;
 
     if (!CVAR_ON(aim_aimbot) || !can_shoot())
@@ -99,8 +98,13 @@ void aimbot(usercmd_t* cmd) {
     vec3_t engine_viewangles;
     i_engine->GetViewAngles(engine_viewangles);
     vec3_t best_delta = get_closest_delta(engine_viewangles);
-    
+
     if (!vec_is_zero(best_delta)) {
+        
+        if (!lastShotHit) {
+            best_delta.y += 0.5f;
+        }
+
         engine_viewangles.x += best_delta.x;
         engine_viewangles.y += best_delta.y;
         engine_viewangles.z += best_delta.z;
