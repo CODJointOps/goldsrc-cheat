@@ -1,6 +1,8 @@
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
 
 #include "features.h"
 #include "../include/sdk.h"
@@ -10,6 +12,22 @@
 float random_float(float min, float max) {
     return (max - min) * ((float)rand() / (float)RAND_MAX) + min;
 }
+
+bool isSpacebarPressed() {
+    Display* display = XOpenDisplay(NULL);
+    if (!display) {
+        return false;  // Could not open the display, assume not pressed
+    }
+
+    char keys_return[32];
+    XQueryKeymap(display, keys_return);
+    KeyCode kc = XKeysymToKeycode(display, XK_space);
+    bool pressed = (keys_return[kc >> 3] & (1 << (kc & 7))) != 0;
+
+    XCloseDisplay(display);
+    return pressed;
+}
+
 
 void anti_aim(usercmd_t* cmd) {
     if (cmd->buttons & IN_ATTACK || cmd->buttons & IN_USE) {
@@ -47,13 +65,16 @@ void anti_aim(usercmd_t* cmd) {
     flipPitch = !flipPitch;
 
     view_angles.y += 30.0f;
-
+    
+    bool isBunnyHopping = cmd->buttons & IN_JUMP;
+    bool isStationary = (cmd->forwardmove == 0.0f && cmd->sidemove == 0.0f);
+    
     // This shit busted right now
-    if (CVAR_ON(movement_fakeduck) && cmd->forwardmove == 0.0f && cmd->sidemove == 0.0f) {
+    if (CVAR_ON(movement_fakeduck) && (isStationary || isBunnyHopping || isSpacebarPressed())) {
         static int duckCounter = 0;
-        if (duckCounter < 5) {
+        if (duckCounter < 2) {
             cmd->buttons |= IN_DUCK;
-        } else if (duckCounter < 10) {
+        } else if (duckCounter < 4) {
             cmd->buttons &= ~IN_DUCK;
         } else {
             duckCounter = 0;
