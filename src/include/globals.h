@@ -36,6 +36,7 @@ enum game_id {
 extern game_id this_game_id;
 extern vec3_t g_punchAngles;
 extern float g_flNextAttack, g_flNextPrimaryAttack;
+extern float* scr_fov_value;
 extern int g_iClip;
 extern double g_flCurrentTime;
 

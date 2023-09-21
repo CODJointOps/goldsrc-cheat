@@ -35,6 +35,8 @@ void* player_extra_info;
 /* Updated in CL_CreateMove hook */
 cl_entity_t* localplayer = NULL;
 
+float* scr_fov_value = NULL;
+
 /*----------------------------------------------------------------------------*/
 
 bool globals_init(void) {
@@ -68,6 +70,8 @@ bool globals_init(void) {
 
     game_info = *(game_t**)dlsym(hw, "game");
 
+    scr_fov_value = (float*)dlsym(hw, "scr_fov_value");
+    
     if (!i_engine || !i_client || !i_pmove || !i_enginestudio ||
         !i_studiomodelrenderer || !game_info) {
         printf("goldsource-cheat: globals_init: couldn't load some symbols\n");

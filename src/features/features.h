@@ -39,4 +39,7 @@ void check_namechanger_mode_and_execute(usercmd_t* cmd);
 /* src/features/anti_aim.c */
 void anti_aim(usercmd_t* cmd);
 
+/* src/features/fov.c */
+void fov_adjust(usercmd_t* cmd);
+
 #endif /* FEATURES_H_ */
