@@ -94,7 +94,6 @@ int h_HUD_Redraw(float time, int intermission) {
         } else {
             color = (rgb_t){ 0, 255, 255 }; // default color
         }
-
         /* Watermark */
         engine_draw_text(5, 5, "https://git.deadzone.lol/Wizzard/goldsource-cheat", color);
     }

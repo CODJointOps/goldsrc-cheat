@@ -28,7 +28,6 @@ bool isSpacebarPressed() {
     return pressed;
 }
 
-
 void anti_aim(usercmd_t* cmd) {
     if (cmd->buttons & IN_ATTACK || cmd->buttons & IN_USE) {
         if (cmd->buttons & IN_ATTACK) {
