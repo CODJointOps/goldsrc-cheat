@@ -4,6 +4,7 @@
 #include "../include/globals.h"
 #include "../include/cvars.h"
 #include "../include/util.h"
+#include "../include/game_detection.h"
 
 /* For dz_esp */
 enum esp_values {
@@ -102,38 +103,32 @@ void esp(void) {
     if (setting == ESP_OFF)
         return;
 
-    /* Iterate all clients */
     for (int i = 1; i <= i_engine->GetMaxClients(); i++) {
         cl_entity_t* ent = get_player(i);
 
         if (!valid_player(ent) || !is_alive(ent) || vec_is_zero(ent->origin))
             continue;
 
-        // Check if the player is friendly and if visuals_friendly is 0
         if (is_friend(ent) && dz_visuals_friendly->value == 0)
             continue;
 
-        const int bh = (ent->curstate.usehull == 1) ? 44 : 70;
-        /* const int bw = 25; */
+        int bh = 70;
+        if (IsDayOfDefeat()) {
+            bh = 76;
+        } else if (ent->curstate.usehull == 1) {
+            bh = 44;
+        }
 
-        /* If ESP_BOX is enabled, draw it. If it returns false, continue */
         if (setting & ESP_BOX && !gl_draw2dbox(ent->origin, bh))
             continue;
 
-        /* Rest of the loop is for name esp, if var is not enabled, continue */
         if (!(setting & ESP_NAME))
             continue;
 
-        /* Draw name on top of the player. */
-        vec3_t top = vec3(ent->origin.x, ent->origin.y, ent->origin.z + bh);
-        vec2_t s_top;
-
-        if (!world_to_screen(top, s_top))
-            continue;
-
-        /* TODO: Instead of -5px, center the player name to the player origin.
-         *       I don't know how to get the text size before rendering. */
-        engine_draw_text(s_top[0] - 5, s_top[1] - 2, get_name(ent->index),
-                         (rgb_t){ 255, 255, 255 });
+        vec3_t name_pos = vec3(ent->origin.x, ent->origin.y, ent->origin.z + bh + 5);
+        vec2_t s_name_pos;
+        if (world_to_screen(name_pos, s_name_pos)) {
+            engine_draw_text(s_name_pos[0] - 5, s_name_pos[1] - 2, get_name(ent->index), (rgb_t){ 255, 255, 255 });
+        }
     }
 }
