@@ -33,6 +33,9 @@ void aimbot(usercmd_t* cmd);
 void custom_crosshair(void);
 void bullet_tracers(usercmd_t* cmd);
 
+/* src/features/namechanger.c */
+void check_namechanger_mode_and_execute(usercmd_t* cmd);
+
 /* src/features/anti_aim.c */
 void anti_aim(usercmd_t* cmd);
 

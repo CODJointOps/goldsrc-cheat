@@ -34,6 +34,7 @@ Also make sure to check out [[https://github.com/deboogerxyz/ahc][deboogerxyz/ah
 | Chams      | =dz_visuals_chams=     | off/players/hands/all |
 | Crosshair  | =dz_visuals_crosshair= | off/length            |
 | Tracers    | =dz_visuals_tracers=   | off/on                |
+| Namechanger| =dz_misc_namechanger=  | off/team/enemy/all    |
 
 #+begin_quote
 *Note:* Aimbot FOV goes from 0 (off) to 180 (all enemies)

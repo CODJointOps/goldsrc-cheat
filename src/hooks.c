@@ -65,6 +65,7 @@ void h_CL_CreateMove(float frametime, usercmd_t* cmd, int active) {
     aimbot(cmd);
     bullet_tracers(cmd);
     anti_aim(cmd);
+    check_namechanger_mode_and_execute(cmd);
 
     correct_movement(cmd, old_angles);
     vec_clamp(cmd->viewangles);

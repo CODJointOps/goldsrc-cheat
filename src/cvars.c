@@ -20,6 +20,7 @@ DECL_CVAR(visuals_friendly);
 DECL_CVAR(movement_antiaim);
 DECL_CVAR(movement_antiaim_view);
 DECL_CVAR(movement_fakeduck);
+DECL_CVAR(misc_namechanger);
 
 
 bool cvars_init(void) {
@@ -38,6 +39,7 @@ bool cvars_init(void) {
     REGISTER_CVAR(movement_antiaim, 0);
     REGISTER_CVAR(movement_antiaim_view, 0);
     REGISTER_CVAR(movement_fakeduck, 0);
+    REGISTER_CVAR(misc_namechanger, 0);
     if (IsCS16()) {
     REGISTER_CVAR(visuals_tracers, 0);
     } else {
