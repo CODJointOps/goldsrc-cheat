@@ -10,7 +10,7 @@
 /* Game units to add to the entity origin to get the head */
 #define HL1_HEAD_OFFSET 25.f
 #define CS16_HEAD_OFFSET 22.f
-#define CS16_HORIZONTAL_OFFSET 10.0f
+#define CS16_HORIZONTAL_OFFSET 8.0f
 
 /* Scale factor for aim punch */
 #define AIM_PUNCH_MULT 2
