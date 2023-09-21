@@ -163,10 +163,15 @@ bool world_to_screen(vec3_t vec, vec2_t screen) {
     scr_inf.iSize = sizeof(SCREENINFO);
     i_engine->pfnGetScreenInfo(&scr_inf);
 
-    /* If within bounds, transform to screen scale */
     if (screen[0] < 1 && screen[1] < 1 && screen[0] > -1 && screen[1] > -1) {
+    if (IsDayOfDefeat()) {
+        printf("Before transformation: %f, %f, Depth: %f\n", screen[0], screen[1], screen[2]);
+        screen[0] = ((screen[0] + 1) * 0.5) * scr_inf.iWidth;
+        screen[1] = ((1 - screen[1]) * 0.5) * scr_inf.iHeight;    
+    } else {
         screen[0] = screen[0] * (scr_inf.iWidth / 2) + (scr_inf.iWidth / 2);
         screen[1] = -screen[1] * (scr_inf.iHeight / 2) + (scr_inf.iHeight / 2);
+    }
 
         return true;
     }
