@@ -90,6 +90,7 @@ static vec3_t get_closest_delta(vec3_t viewangles) {
 }
 
 void aimbot(usercmd_t* cmd) {
+    static bool shouldShootNextFrame = false;  // If you're not using this variable, you can remove it.
     static bool hasAdjustedView = false;
 
     if (!CVAR_ON(aim_aimbot) || !can_shoot())
@@ -100,11 +101,13 @@ void aimbot(usercmd_t* cmd) {
     vec3_t best_delta = get_closest_delta(engine_viewangles);
 
     if (!vec_is_zero(best_delta)) {
-        
+        /*
         if (!lastShotHit) {
-            best_delta.y += 0.5f;
+            // If the last shot missed, adjust the angle slightly
+            // This is a simple approach and might need further tweaking
+            best_delta.y += 0.5f;  // Adjust yaw slightly
         }
-
+        */
         engine_viewangles.x += best_delta.x;
         engine_viewangles.y += best_delta.y;
         engine_viewangles.z += best_delta.z;
@@ -128,4 +131,7 @@ void aimbot(usercmd_t* cmd) {
     } else if (CVAR_ON(aim_autoshoot) && (cmd->buttons & IN_ATTACK)) {
         cmd->buttons &= ~IN_ATTACK;
     }
+
+
 }
+
