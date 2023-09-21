@@ -45,6 +45,7 @@ DECL_CVAR_EXTERN(aim_aimbot_silent);
 DECL_CVAR_EXTERN(visuals_friendly);
 DECL_CVAR_EXTERN(movement_antiaim);
 DECL_CVAR_EXTERN(movement_antiaim_view);
+DECL_CVAR_EXTERN(movement_fakeduck);
 
 
 /*----------------------------------------------------------------------------*/
