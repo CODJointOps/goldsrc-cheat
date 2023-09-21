@@ -90,12 +90,15 @@ static vec3_t get_closest_delta(vec3_t viewangles) {
 }
 
 void aimbot(usercmd_t* cmd) {
-    if (!CVAR_ON(aim_aimbot) || !(cmd->buttons & IN_ATTACK) || !can_shoot())
+    static bool shouldShootNextFrame = false;
+
+    if (!CVAR_ON(aim_aimbot) || !can_shoot())
         return;
 
     vec3_t engine_viewangles;
     i_engine->GetViewAngles(engine_viewangles);
     vec3_t best_delta = get_closest_delta(engine_viewangles);
+    
     if (!vec_is_zero(best_delta)) {
         engine_viewangles.x += best_delta.x;
         engine_viewangles.y += best_delta.y;
@@ -103,10 +106,24 @@ void aimbot(usercmd_t* cmd) {
 
         if (CVAR_ON(aim_aimbot_silent)) {
             vec_copy(cmd->viewangles, engine_viewangles);
+            if (cmd->buttons & IN_ATTACK) {
+                if (shouldShootNextFrame) {
+                    cmd->buttons |= IN_ATTACK;
+                    shouldShootNextFrame = false;
+                } else {
+                    cmd->buttons &= ~IN_ATTACK;
+                    shouldShootNextFrame = true;
+                }
+            }
         } else {
-            i_engine->SetViewAngles(engine_viewangles);
+            if (cmd->buttons & IN_ATTACK) {  // Ensure left click is pressed before adjusting aim for non-silent
+                i_engine->SetViewAngles(engine_viewangles);
+            }
         }
-    } else if (CVAR_ON(aim_autoshoot)) {
+
+    } else if (CVAR_ON(aim_autoshoot) && (cmd->buttons & IN_ATTACK)) {
         cmd->buttons &= ~IN_ATTACK;
+    } else {
+        shouldShootNextFrame = false;  // Reset
     }
 }
