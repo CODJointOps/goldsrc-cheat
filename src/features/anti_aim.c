@@ -12,6 +12,15 @@ float random_float(float min, float max) {
 }
 
 void anti_aim(usercmd_t* cmd) {
+    if (cmd->buttons & IN_ATTACK || cmd->buttons & IN_USE) {
+        if (cmd->buttons & IN_ATTACK) {
+            i_engine->pfnClientCmd("echo \"Attack detected. Spinbot stopped.\"");
+        } else if (cmd->buttons & IN_USE) {
+            i_engine->pfnClientCmd("echo \"Use key detected. Spinbot stopped.\"");
+        }
+        return;
+    }
+
     if (!CVAR_ON(movement_antiaim)) {
         return;
     }
@@ -44,4 +53,5 @@ void anti_aim(usercmd_t* cmd) {
         last_log_time = cmd->msec;
     }
 }
+
 
