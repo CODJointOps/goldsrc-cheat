@@ -12,20 +12,31 @@ float random_float(float min, float max) {
 }
 
 void anti_aim(usercmd_t* cmd) {
-    if (!CVAR_ON(movement_antiaim) || !is_alive(localplayer)) {
+    if (!CVAR_ON(movement_antiaim)) {
+        return;
+    }
+    
+    if (!is_alive(localplayer)) {
         return;
     }
 
     vec3_t random_angles;
+    i_engine->GetViewAngles(random_angles);
+    
     random_angles.x = random_float(-89.0f, 89.0f);
     random_angles.y = random_float(-180.0f, 180.0f);
     random_angles.z = 0.0f;
+    char logMsg[128];
+    snprintf(logMsg, sizeof(logMsg), "echo \"Generated random angles: [%f, %f, %f]\"", random_angles.x, random_angles.y, random_angles.z);
+    i_engine->pfnClientCmd(logMsg);
 
     if (CVAR_ON(movement_antiaim_view)) {
-        i_engine->SetViewAngles(random_angles); 
+        i_engine->SetViewAngles(random_angles);
+        i_engine->pfnClientCmd("echo \"Set view angles directly using movement_antiaim_view.\"");
+    } else {
+        vec_copy(cmd->viewangles, random_angles);
+        i_engine->pfnClientCmd("echo \"Set view angles silently.\"");
     }
-
-    vec_copy(random_angles, cmd->viewangles);
 
     static float last_log_time = 0.0f;
     if (cmd->msec - last_log_time >= 5000.0f) {
@@ -33,3 +44,4 @@ void anti_aim(usercmd_t* cmd) {
         last_log_time = cmd->msec;
     }
 }
+
