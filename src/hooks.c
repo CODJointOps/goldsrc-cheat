@@ -97,7 +97,7 @@ int h_HUD_Redraw(float time, int intermission) {
             color = (rgb_t){ 0, 255, 255 }; // default color
         }
         /* Watermark */
-        engine_draw_text(5, 5, "https://git.deadzone.lol/Wizzard/goldsource-cheat", color);
+        engine_draw_text(5, 5, "https://git.deadzone.lol/Wizzard/goldsrc-cheat", color);
     }
 
     esp();

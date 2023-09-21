@@ -58,7 +58,7 @@ void load(void) {
     
     i_engine->pfnClientCmd("echo \"goldsource-cheat loaded successfully!\"");
     i_engine->pfnClientCmd("echo \"Deadzone rulez!\"");
-    i_engine->pfnClientCmd("echo \"https://git.deadzone.lol/Wizzard/goldsource-cheat\"");
+    i_engine->pfnClientCmd("echo \"https://git.deadzone.lol/Wizzard/goldsrc-cheat\"");
 
 
     GameType game = get_current_game();
