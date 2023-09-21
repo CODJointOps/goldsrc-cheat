@@ -9,8 +9,8 @@
 
 /* Game units to add to the entity origin to get the head */
 #define HL1_HEAD_OFFSET 25.f
-#define CS16_HEAD_OFFSET 23.f
-#define CS16_HORIZONTAL_OFFSET 5.0f
+#define CS16_HEAD_OFFSET 22.f
+#define CS16_HORIZONTAL_OFFSET 10.0f
 
 /* Scale factor for aim punch */
 #define AIM_PUNCH_MULT 2
@@ -95,26 +95,18 @@ void aimbot(usercmd_t* cmd) {
 
     vec3_t engine_viewangles;
     i_engine->GetViewAngles(engine_viewangles);
-
     vec3_t best_delta = get_closest_delta(engine_viewangles);
     if (!vec_is_zero(best_delta)) {
         engine_viewangles.x += best_delta.x;
         engine_viewangles.y += best_delta.y;
         engine_viewangles.z += best_delta.z;
-        
+
         if (CVAR_ON(aim_aimbot_silent)) {
             vec_copy(cmd->viewangles, engine_viewangles);
         } else {
-            vec_copy(cmd->viewangles, engine_viewangles);
             i_engine->SetViewAngles(engine_viewangles);
         }
     } else if (CVAR_ON(aim_autoshoot)) {
         cmd->buttons &= ~IN_ATTACK;
     }
 }
-
-
-
-
-
-
