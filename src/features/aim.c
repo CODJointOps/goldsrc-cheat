@@ -11,6 +11,8 @@
 #define HL1_HEAD_OFFSET 25.f
 #define CS16_HEAD_OFFSET 22.f
 #define CS16_HORIZONTAL_OFFSET 8.0f
+#define DOD_HEAD_OFFSET 22.f
+#define DOD_HORIZONTAL_OFFSET 8.0f
 
 /* Scale factor for aim punch */
 #define AIM_PUNCH_MULT 2
@@ -54,6 +56,9 @@ static vec3_t get_closest_delta(vec3_t viewangles) {
             if (IsCS16()) {
                 head_pos.z += CS16_HEAD_OFFSET;
                 head_pos.x += CS16_HORIZONTAL_OFFSET;
+            } else if (IsDayOfDefeat()) {
+                head_pos.z += DOD_HEAD_OFFSET;
+                head_pos.x += DOD_HORIZONTAL_OFFSET;
             } else {
                 head_pos.z += HL1_HEAD_OFFSET;
             }
