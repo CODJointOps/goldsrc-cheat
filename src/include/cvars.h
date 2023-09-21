@@ -47,6 +47,7 @@ DECL_CVAR_EXTERN(movement_antiaim);
 DECL_CVAR_EXTERN(movement_antiaim_view);
 DECL_CVAR_EXTERN(movement_fakeduck);
 DECL_CVAR_EXTERN(misc_namechanger)
+DECL_CVAR_EXTERN(misc_namechanger_speed)
 
 
 /*----------------------------------------------------------------------------*/

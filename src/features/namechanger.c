@@ -17,7 +17,7 @@ void change_name(const char* new_name) {
     if (!new_name) return;
 
     char command[256];
-    snprintf(command, sizeof(command), "name \"%s\u200B\"", new_name);
+    snprintf(command, sizeof(command), "name \"%s\u0315 \"", new_name);
     i_engine->pfnClientCmd(command);
 }
 
@@ -72,7 +72,7 @@ void change_name_all_players() {
 void change_name_based_on_mode(usercmd_t* cmd) {
     if (!CVAR_ON(misc_namechanger)) return;
 
-    if (++change_counter < NAME_CHANGE_INTERVAL) {
+    if (++change_counter < dz_misc_namechanger_speed->value) {
         return;
     }
     change_counter = 0;
