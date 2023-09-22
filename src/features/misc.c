@@ -34,16 +34,30 @@ void custom_crosshair(void) {
 weapon_data_t g_currentWeapon;
 static double lastTracerTime = 0;
     
+static bool attackReleased = true;
+
 void bullet_tracers(usercmd_t* cmd) {
-    /* Only draw if we are holding attack and we can shoot */
-    if (!CVAR_ON(visuals_tracers) || !(cmd->buttons & IN_ATTACK) || !can_shoot() || !is_alive(localplayer))
+    if (!CVAR_ON(visuals_tracers) || !is_alive(localplayer))
         return;
-    /* Dirty temp fix for tracers being spammed in CS1.6 */
-    if (IsCS16() && (g_flCurrentTime - lastTracerTime < 0.5)) {
-        return;
-    }
 
     if (IsCS16()) {
+        if (cmd->buttons & IN_ATTACK) {
+            if (!attackReleased) {
+                return;
+            }
+            attackReleased = false;
+        } else {
+            attackReleased = true;
+            return;
+        }
+        if (!can_shoot()) {
+            return;
+        }
+    } 
+    else {
+        if (!(cmd->buttons & IN_ATTACK) || !can_shoot()) {
+            return;
+        }
     }
 
     /* Get player eye pos, start of tracer */
@@ -65,6 +79,4 @@ void bullet_tracers(usercmd_t* cmd) {
     const float w    = 0.8;
     const float time = 2;
     draw_tracer(local_eyes, end, (rgb_t){ 66, 165, 245 }, 1, w, time);
-    lastTracerTime = g_flCurrentTime;
 }
-
