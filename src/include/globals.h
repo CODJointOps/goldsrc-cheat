@@ -9,6 +9,7 @@ enum game_id {
     CS  = 1, /* Counter-Strike 1.6 */
     TF  = 2, /* Team Fortress Classic */
     DOD = 3, /* Day of Defeat */
+    SL = 4, /* Space Life: Finleys Revenge */
 };
 
 /*----------------------------------------------------------------------------*/

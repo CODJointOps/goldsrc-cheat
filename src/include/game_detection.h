@@ -7,7 +7,8 @@ typedef enum {
     GAME_CS16,
     GAME_TFC,
     GAME_DAY_OF_DEFEAT,
-    GAME_DMC
+    GAME_DMC,
+    GAME_SL
 } GameType;
 
 GameType get_current_game(void);
@@ -16,5 +17,6 @@ int IsHalfLife(void);
 int IsDayOfDefeat(void);
 int IsTFC(void);
 int IsDeathmatchClassic(void);
+int IsSpaceLife(void);
 
 #endif

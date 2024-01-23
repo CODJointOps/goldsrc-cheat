@@ -1,4 +1,5 @@
 
+#include <ctype.h>
 #include <stdio.h>
 #include <dlfcn.h>
 
@@ -51,6 +52,9 @@ void load(void) {
     else if (IsDeathmatchClassic()) {
         i_engine->pfnClientCmd("play 'sound/items/suit.wav'");
     }
+    else if (IsSpaceLife()) {
+        i_engine->pfnClientCmd("play 'sound/finley/soccer_ball.wav'");
+    }
     else
     {
         i_engine->pfnClientCmd("play 'valve/sound/vox/suit.wav'");
@@ -77,6 +81,9 @@ void load(void) {
             break;
         case GAME_DMC:
             i_engine->pfnClientCmd("echo \"Detected Game: Deathmatch Classic\"");
+            break;
+        case GAME_SL:
+            i_engine->pfnClientCmd("echo \"Detected Game: Space Life: Finley's Revenge\"");
             break;
         default:
             i_engine->pfnClientCmd("echo \"Detected Game: Unknown Game\"");

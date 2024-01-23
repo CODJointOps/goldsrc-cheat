@@ -42,7 +42,9 @@ GameType get_current_game(void) {
                     current_game = GAME_DMC;    
                 } else if (strcmp(gameTypeToken, "tfc") == 0) {
                     current_game = GAME_TFC;
-                }
+                } else if (strcmp(gameTypeToken, "SpaceLife") == 0) {
+                    current_game = GAME_SL;
+                }  
             } else if (steamToken && tokensFound == 2) {
                 // If only `-steam` is found and no `-game`, with only two tokens, assume it's Half-Life 1
                 current_game = GAME_HALFLIFE;
@@ -71,4 +73,8 @@ int IsTFC(void) {
 
 int IsDeathmatchClassic(void) {
     return get_current_game() == GAME_DMC;
+}
+
+int IsSpaceLife(void) {
+    return get_current_game() == GAME_SL;
 }
