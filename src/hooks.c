@@ -193,6 +193,8 @@ void h_CL_CreateMove(float frametime, usercmd_t* cmd, int active) {
     float origUp = cmd->upmove;
     int origButtons = cmd->buttons;
 
+    fov_adjust(cmd);
+
     if (g_menu_open && !g_settings.menu_allow_movement) {
         cmd->forwardmove = 0.0f;
         cmd->sidemove = 0.0f;
@@ -217,7 +219,6 @@ void h_CL_CreateMove(float frametime, usercmd_t* cmd, int active) {
         bullet_tracers(cmd);
         anti_aim(cmd);
         check_namechanger_mode_and_execute(cmd);
-        fov_adjust(cmd);
         
         if (g_menu_open && s_lock_initialized) {
             vec_copy(cmd->viewangles, s_locked_view_angles);

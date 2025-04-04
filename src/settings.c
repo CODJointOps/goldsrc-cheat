@@ -10,36 +10,127 @@
 
 cheat_settings_t g_settings;
 
+static bool copy_file(const char* src_path, const char* dst_path) {
+    FILE* src = fopen(src_path, "rb");
+    if (!src) {
+        return false;
+    }
+    
+    FILE* dst = fopen(dst_path, "wb");
+    if (!dst) {
+        fclose(src);
+        return false;
+    }
+    
+    char buffer[4096];
+    size_t bytes;
+    
+    while ((bytes = fread(buffer, 1, sizeof(buffer), src)) > 0) {
+        if (fwrite(buffer, 1, bytes, dst) != bytes) {
+            fclose(src);
+            fclose(dst);
+            return false;
+        }
+    }
+    
+    fclose(src);
+    fclose(dst);
+    return true;
+}
+
+bool create_root_default_config(void) {
+    cheat_settings_t preset;
+    memset(&preset, 0, sizeof(preset));
+    
+    preset.esp_mode = ESP_BOX;
+    preset.chams = true;
+    preset.aimbot_enabled = true;
+    preset.aimbot_fov = 5.0f;
+    preset.bhop = true;
+    preset.autostrafe = true;
+    preset.thirdperson = false;
+    preset.thirdperson_key = 'C';
+    preset.thirdperson_dist = 150.0f;
+    preset.watermark = true;
+    preset.watermark_rainbow = true;
+    preset.fov = 90.0f;
+    
+    FILE* file = fopen("../default.cfg", "wb");
+    if (!file) {
+        i_engine->Con_Printf("Error: Could not create root default.cfg\n");
+        return false;
+    }
+    
+    size_t written = fwrite(&preset, sizeof(preset), 1, file);
+    fclose(file);
+    
+    if (written != 1) {
+        i_engine->Con_Printf("Error: Failed to write to root default.cfg\n");
+        return false;
+    }
+    
+    i_engine->Con_Printf("Successfully created ../default.cfg with preset settings\n");
+    return true;
+}
 
 void settings_init(void) {
     init_default_settings();
     
+    char cwd[1024] = {0};
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        i_engine->Con_Printf("Current working directory: %s\n", cwd);
+    }
+    
     const char* config_dir = get_config_dir();
-    if (config_dir) {
-        char filepath[1024];
-        snprintf(filepath, sizeof(filepath), "%s/default.cfg", config_dir);
+    if (!config_dir) {
+        i_engine->Con_Printf("Error: Could not get config directory, using defaults\n");
+        return;
+    }
+    
+    char config_path[1024];
+    snprintf(config_path, sizeof(config_path), "%s/default.cfg", config_dir);
+    i_engine->Con_Printf("Config path: %s\n", config_path);
+    
+    if (access(config_path, F_OK) == 0) {
+        i_engine->Con_Printf("Found config, loading from: %s\n", config_path);
         
-        if (access(filepath, F_OK) != 0) {
-            char cmd[2048];
-            snprintf(cmd, sizeof(cmd), "cp -f default.cfg %s/ 2>/dev/null", config_dir);
-            if (system(cmd) == 0) {
-                i_engine->Con_Printf("Copied default config from project root to %s\n", config_dir);
-            } else {
-                i_engine->Con_Printf("No default config found in project root or couldn't copy\n");
-            }
-        }
-        
-        if (access(filepath, F_OK) == 0) {
-            i_engine->Con_Printf("Loading default configuration...\n");
-            settings_load_from_file("default");
+        if (settings_load_from_file("default")) {
+            i_engine->Con_Printf("Successfully loaded config\n");
         } else {
-            i_engine->Con_Printf("No default config found, using built-in defaults\n");
+            i_engine->Con_Printf("Error loading config, using defaults\n");
+        }
+    } 
+    else if (access("../default.cfg", F_OK) == 0) {
+        i_engine->Con_Printf("Found config in project dir, copying to user config...\n");
+        
+        if (copy_file("../default.cfg", config_path)) {
+            i_engine->Con_Printf("Successfully copied project config to user directory\n");
+            
+            if (settings_load_from_file("default")) {
+                i_engine->Con_Printf("Successfully loaded copied config\n");
+            } else {
+                i_engine->Con_Printf("Error loading copied config, using defaults\n");
+            }
+        } else {
+            i_engine->Con_Printf("Error copying project config, using defaults\n");
+        }
+    }
+    // No config exists, create it with defaults
+    else {
+        i_engine->Con_Printf("No config found anywhere, creating default config with current settings\n");
+        
+        if (settings_save_to_file("default")) {
+            i_engine->Con_Printf("Created new default config\n");
+        } else {
+            i_engine->Con_Printf("Error creating default config\n");
         }
     }
     
-    g_settings.thirdperson_key = 'C';
+    if (g_settings.thirdperson_key == 0) {
+        g_settings.thirdperson_key = 'C';
+    }
     
-    i_engine->Con_Printf("Settings initialized with defaults. Third-person key bound to C.\n");
+    i_engine->Con_Printf("Settings initialized. Third-person key: %d\n", g_settings.thirdperson_key);
 }
 
 
@@ -108,6 +199,7 @@ const char* get_config_dir(void) {
 bool settings_save_to_file(const char* filename) {
     const char* config_dir = get_config_dir();
     if (!config_dir) {
+        i_engine->Con_Printf("Error: Could not get config directory\n");
         return false;
     }
     
@@ -120,6 +212,7 @@ bool settings_save_to_file(const char* filename) {
         return false;
     }
     
+    // Simple direct binary write of the settings
     size_t written = fwrite(&g_settings, sizeof(g_settings), 1, file);
     fclose(file);
     
@@ -135,11 +228,17 @@ bool settings_save_to_file(const char* filename) {
 bool settings_load_from_file(const char* filename) {
     const char* config_dir = get_config_dir();
     if (!config_dir) {
+        i_engine->Con_Printf("Error: Could not get config directory\n");
         return false;
     }
     
     char filepath[1024];
     snprintf(filepath, sizeof(filepath), "%s/%s.cfg", config_dir, filename);
+    
+    if (access(filepath, F_OK) != 0) {
+        i_engine->Con_Printf("Error: Config file does not exist: %s\n", filepath);
+        return false;
+    }
     
     FILE* file = fopen(filepath, "rb");
     if (!file) {
@@ -147,8 +246,16 @@ bool settings_load_from_file(const char* filename) {
         return false;
     }
     
-    cheat_settings_t temp_settings;
-    size_t read = fread(&temp_settings, sizeof(temp_settings), 1, file);
+    // Get file size for debugging
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    
+    i_engine->Con_Printf("Loading config from %s, file size: %ld bytes, struct size: %zu bytes\n", 
+                       filepath, file_size, sizeof(cheat_settings_t));
+    
+    // Simple direct binary read of the settings
+    size_t read = fread(&g_settings, sizeof(g_settings), 1, file);
     fclose(file);
     
     if (read != 1) {
@@ -156,12 +263,69 @@ bool settings_load_from_file(const char* filename) {
         return false;
     }
     
-    memcpy(&g_settings, &temp_settings, sizeof(g_settings));
+    i_engine->Con_Printf("Settings loaded. Aimbot=%d, ESP=%d, Bhop=%d, ThirdPerson=%d, TPDist=%.1f\n",
+                       g_settings.aimbot_enabled, g_settings.esp_mode, g_settings.bhop,
+                       g_settings.thirdperson, g_settings.thirdperson_dist);
     
-    i_engine->Con_Printf("Settings loaded from %s\n", filepath);
     return true;
 }
 
 bool settings_set_as_default(void) {
     return settings_save_to_file("default");
+}
+
+bool settings_create_root_default(void) {
+    return create_root_default_config();
+}
+
+// Add a simple function to copy config from ~/gitprojects/goldsource-cheat/default.cfg to ~/.config/dz-goldsrccheat/default.cfg
+bool copy_project_config_to_user(void) {
+    const char* config_dir = get_config_dir();
+    if (!config_dir) {
+        i_engine->Con_Printf("Error: Could not get config directory\n");
+        return false;
+    }
+    
+    char dst_path[1024];
+    snprintf(dst_path, sizeof(dst_path), "%s/default.cfg", config_dir);
+    
+    // Check if source exists
+    if (access("../default.cfg", F_OK) != 0) {
+        i_engine->Con_Printf("Error: Source config ../default.cfg does not exist\n");
+        return false;
+    }
+    
+    if (!copy_file("../default.cfg", dst_path)) {
+        i_engine->Con_Printf("Error: Failed to copy ../default.cfg to %s\n", dst_path);
+        return false;
+    }
+    
+    i_engine->Con_Printf("Successfully copied project config to user directory\n");
+    return true;
+}
+
+// Add a simple function to copy config from ~/.config/dz-goldsrccheat/default.cfg to ~/gitprojects/goldsource-cheat/default.cfg
+bool copy_user_config_to_project(void) {
+    const char* config_dir = get_config_dir();
+    if (!config_dir) {
+        i_engine->Con_Printf("Error: Could not get config directory\n");
+        return false;
+    }
+    
+    char src_path[1024];
+    snprintf(src_path, sizeof(src_path), "%s/default.cfg", config_dir);
+    
+    // Check if source exists
+    if (access(src_path, F_OK) != 0) {
+        i_engine->Con_Printf("Error: Source config %s does not exist\n", src_path);
+        return false;
+    }
+    
+    if (!copy_file(src_path, "../default.cfg")) {
+        i_engine->Con_Printf("Error: Failed to copy %s to ../default.cfg\n", src_path);
+        return false;
+    }
+    
+    i_engine->Con_Printf("Successfully copied user config to project directory\n");
+    return true;
 } 

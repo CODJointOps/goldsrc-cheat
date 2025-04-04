@@ -414,91 +414,10 @@ extern "C" void menu_render(void) {
                         ImGui::OpenPopup("ConfirmDelete");
                     }
                     
-                    if (ImGui::BeginPopupModal("ConfirmReset", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-                        ImGui::Text("Are you sure you want to reset all settings?");
-                        ImGui::Text("This cannot be undone!");
-                        ImGui::Separator();
-                        
-                        if (ImGui::Button("Yes", ImVec2(120, 0))) {
-                            settings_reset();
-                            ImGui::CloseCurrentPopup();
-                        }
-                        
-                        ImGui::SameLine();
-                        if (ImGui::Button("No", ImVec2(120, 0))) {
-                            ImGui::CloseCurrentPopup();
-                        }
-                        
-                        ImGui::EndPopup();
-                    }
-                    
-                    if (ImGui::BeginPopupModal("ConfirmDelete", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-                        ImGui::Text("Are you sure you want to delete this config?");
-                        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "%s.cfg", config_name);
-                        ImGui::Text("This cannot be undone!");
-                        ImGui::Separator();
-                        
-                        if (ImGui::Button("Yes", ImVec2(120, 0))) {
-                            const char* config_dir = get_config_dir();
-                            if (config_dir) {
-                                char filepath[1024];
-                                snprintf(filepath, sizeof(filepath), "%s/%s.cfg", config_dir, config_name);
-                                
-                                if (remove(filepath) == 0) {
-                                    i_engine->Con_Printf("Deleted config file: %s\n", filepath);
-                                    s_need_refresh_configs = true;
-                                    ImGui::CloseCurrentPopup();
-                                } else {
-                                    i_engine->Con_Printf("Error deleting config file: %s\n", filepath);
-                                    ImGui::OpenPopup("ConfigError");
-                                }
-                            }
-                            ImGui::CloseCurrentPopup();
-                        }
-                        
-                        ImGui::SameLine();
-                        if (ImGui::Button("No", ImVec2(120, 0))) {
-                            ImGui::CloseCurrentPopup();
-                        }
-                        
-                        ImGui::EndPopup();
-                    }
-                    
-                    if (ImGui::BeginPopupModal("ConfigSaved", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-                        ImGui::Text("Configuration saved successfully!");
-                        if (ImGui::Button("OK", ImVec2(120, 0))) {
-                            ImGui::CloseCurrentPopup();
-                        }
-                        ImGui::EndPopup();
-                    }
-                    
-                    if (ImGui::BeginPopupModal("ConfigLoaded", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-                        ImGui::Text("Configuration loaded successfully!");
-                        if (ImGui::Button("OK", ImVec2(120, 0))) {
-                            ImGui::CloseCurrentPopup();
-                        }
-                        ImGui::EndPopup();
-                    }
-                    
-                    if (ImGui::BeginPopupModal("DefaultSaved", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-                        ImGui::Text("Current settings saved as default configuration!");
-                        ImGui::Text("These settings will load automatically on startup.");
-                        if (ImGui::Button("OK", ImVec2(120, 0))) {
-                            ImGui::CloseCurrentPopup();
-                        }
-                        ImGui::EndPopup();
-                    }
-                    
-                    if (ImGui::BeginPopupModal("ConfigError", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-                        ImGui::Text("Error with configuration operation!");
-                        ImGui::Text("Check console for details.");
-                        if (ImGui::Button("OK", ImVec2(120, 0))) {
-                            ImGui::CloseCurrentPopup();
-                        }
-                        ImGui::EndPopup();
-                    }
+                    ImGui::Separator();
                     
                     ImGui::Separator();
+                    
                     ImGui::Text("Available Configs:");
                     
                     if (s_need_refresh_configs) {
