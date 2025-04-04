@@ -267,6 +267,7 @@ void aimbot(usercmd_t* cmd) {
     
     bool should_run_aimbot = true;
     bool should_autoshoot = g_settings.aimbot_autoshoot;
+    bool fire_button_pressed = (cmd->buttons & IN_ATTACK) != 0;
     
     switch (0) {
         case 0:
@@ -341,12 +342,14 @@ void aimbot(usercmd_t* cmd) {
         }
         
         if (should_autoshoot && can_fire) {
-            if (g_settings.aimbot_rage_mode) {
-                cmd->buttons |= IN_ATTACK;
-            } else {
-                float aim_error = sqrtf(delta.x * delta.x + delta.y * delta.y);
-                if (aim_error < 5.0f) {
+            if (!g_settings.aimbot_require_key || fire_button_pressed) {
+                if (g_settings.aimbot_rage_mode) {
                     cmd->buttons |= IN_ATTACK;
+                } else {
+                    float aim_error = sqrtf(delta.x * delta.x + delta.y * delta.y);
+                    if (aim_error < 5.0f) {
+                        cmd->buttons |= IN_ATTACK;
+                    }
                 }
             }
         }

@@ -199,6 +199,26 @@ extern "C" void menu_render(void) {
                         }
                         
                         ImGui::Checkbox("Auto Shoot", &g_settings.aimbot_autoshoot);
+                        
+                        if (g_settings.aimbot_autoshoot) {
+                            ImGui::SameLine();
+                            ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.1f, 1.0f), "?");
+                            if (ImGui::IsItemHovered()) {
+                                ImGui::BeginTooltip();
+                                ImGui::Text("Auto Shoot automatically fires when aim is on target");
+                                ImGui::EndTooltip();
+                            }
+                            
+                            ImGui::Indent(20);
+                            ImGui::Checkbox("Require Fire Button", &g_settings.aimbot_require_key);
+                            if (ImGui::IsItemHovered()) {
+                                ImGui::BeginTooltip();
+                                ImGui::Text("When enabled, auto-shoot will only fire if you're also pressing the fire button");
+                                ImGui::EndTooltip();
+                            }
+                            ImGui::Unindent(20);
+                        }
+                        
                         ImGui::Checkbox("Silent Aim", &g_settings.aimbot_silent);
                         ImGui::Checkbox("No Recoil", &g_settings.aimbot_norecoil);
                         ImGui::Checkbox("Recoil Compensation", &g_settings.aimbot_recoil_comp);

@@ -152,6 +152,7 @@ void settings_reset(void) {
     g_settings.aimbot_friendly_fire = false;
     g_settings.aimbot_rage_mode = false;
     g_settings.aimbot_team_attack = false;
+    g_settings.aimbot_require_key = false;
     
     g_settings.bhop = false;
     g_settings.autostrafe = false;

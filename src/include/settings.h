@@ -29,6 +29,7 @@ typedef struct {
     float aimbot_smooth;
     bool aimbot_silent;
     bool aimbot_autoshoot;
+    bool aimbot_require_key;
     bool aimbot_norecoil;
     bool aimbot_recoil_comp;
     bool aimbot_friendly_fire;
