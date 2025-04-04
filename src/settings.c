@@ -19,9 +19,21 @@ void settings_init(void) {
         char filepath[1024];
         snprintf(filepath, sizeof(filepath), "%s/default.cfg", config_dir);
         
+        if (access(filepath, F_OK) != 0) {
+            char cmd[2048];
+            snprintf(cmd, sizeof(cmd), "cp -f default.cfg %s/ 2>/dev/null", config_dir);
+            if (system(cmd) == 0) {
+                i_engine->Con_Printf("Copied default config from project root to %s\n", config_dir);
+            } else {
+                i_engine->Con_Printf("No default config found in project root or couldn't copy\n");
+            }
+        }
+        
         if (access(filepath, F_OK) == 0) {
             i_engine->Con_Printf("Loading default configuration...\n");
             settings_load_from_file("default");
+        } else {
+            i_engine->Con_Printf("No default config found, using built-in defaults\n");
         }
     }
     
@@ -148,4 +160,8 @@ bool settings_load_from_file(const char* filename) {
     
     i_engine->Con_Printf("Settings loaded from %s\n", filepath);
     return true;
+}
+
+bool settings_set_as_default(void) {
+    return settings_save_to_file("default");
 } 

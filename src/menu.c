@@ -400,6 +400,16 @@ extern "C" void menu_render(void) {
                     
                     ImGui::Separator();
                     
+                    if (ImGui::Button("Set as Default", ImVec2(120, 30))) {
+                        if (settings_set_as_default()) {
+                            ImGui::OpenPopup("DefaultSaved");
+                        } else {
+                            ImGui::OpenPopup("ConfigError");
+                        }
+                    }
+                    
+                    ImGui::SameLine();
+                    
                     if (ImGui::Button("Delete Config", ImVec2(120, 30))) {
                         ImGui::OpenPopup("ConfirmDelete");
                     }
@@ -464,6 +474,15 @@ extern "C" void menu_render(void) {
                     
                     if (ImGui::BeginPopupModal("ConfigLoaded", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
                         ImGui::Text("Configuration loaded successfully!");
+                        if (ImGui::Button("OK", ImVec2(120, 0))) {
+                            ImGui::CloseCurrentPopup();
+                        }
+                        ImGui::EndPopup();
+                    }
+                    
+                    if (ImGui::BeginPopupModal("DefaultSaved", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+                        ImGui::Text("Current settings saved as default configuration!");
+                        ImGui::Text("These settings will load automatically on startup.");
                         if (ImGui::Button("OK", ImVec2(120, 0))) {
                             ImGui::CloseCurrentPopup();
                         }

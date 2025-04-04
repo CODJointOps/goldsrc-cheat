@@ -58,6 +58,7 @@ void settings_init(void);
 void settings_reset(void);
 bool settings_save_to_file(const char* filename);
 bool settings_load_from_file(const char* filename);
+bool settings_set_as_default(void);
 const char* get_config_dir(void);
 
 inline void init_default_settings(void) {
