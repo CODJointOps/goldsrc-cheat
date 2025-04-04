@@ -3,6 +3,6 @@
 
 #include "../include/sdk.h"
 
-void aim_no_recoil(usercmd_t* cmd);
+void no_recoil(usercmd_t* cmd);
 
 #endif

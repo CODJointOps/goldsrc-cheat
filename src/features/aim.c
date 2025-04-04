@@ -123,10 +123,6 @@ bool is_hitbox_visible(vec3_t eye_pos, hitbox_t* hitbox) {
         
     pmtrace_t* trace = i_engine->PM_TraceLine(eye_pos, hitbox->origin, PM_TRACELINE_PHYSENTSONLY, 2, -1);
     
-    if (g_settings.aimbot_rage_mode && trace->fraction > 0.5f) {
-        return true;
-    }
-    
     if (trace->fraction < 1.0f && trace->ent <= 0)
         return false;
     
@@ -136,7 +132,7 @@ bool is_hitbox_visible(vec3_t eye_pos, hitbox_t* hitbox) {
             return true;
     }
     
-    return false;
+    return trace->fraction >= 1.0f;
 }
 
 typedef struct {
@@ -151,10 +147,6 @@ typedef struct {
 int get_target_priority(cl_entity_t* ent) {
     if (!ent)
         return PRIORITY_NONE;
-    
-    if (g_settings.aimbot_rage_mode) {
-        return PRIORITY_HIGH;
-    }
     
     return PRIORITY_MEDIUM;
 }
@@ -199,17 +191,13 @@ static target_t get_best_target(vec3_t viewangles, vec3_t eye_pos) {
     float best_score = 0.0f;
     float max_fov = g_settings.aimbot_fov;
     
-    if (g_settings.aimbot_rage_mode && max_fov < 90.0f) {
-        max_fov = 90.0f;
-    }
-    
     for (int i = 1; i <= i_engine->GetMaxClients(); i++) {
         cl_entity_t* ent = get_player(i);
         
         if (!ent || !is_alive(ent))
             continue;
             
-        if (!g_settings.aimbot_friendly_fire && is_friend(ent))
+        if (!g_settings.aimbot_team_attack && is_friend(ent))
             continue;
         
         hitbox_t target_hitbox;
@@ -236,16 +224,10 @@ static target_t get_best_target(vec3_t viewangles, vec3_t eye_pos) {
             
         float fov_score = 1.0f - (fov_distance / max_fov);
         
-        float priority_score = 0.0f;
-        if (g_settings.aimbot_rage_mode) {
-            int priority = get_target_priority(ent);
-            priority_score = priority / (float)PRIORITY_HIGH;
-        }
+        int priority = get_target_priority(ent);
+        float priority_score = priority / (float)PRIORITY_HIGH;
         
-        float final_score = fov_score;
-        if (g_settings.aimbot_rage_mode) {
-            final_score = (fov_score * 0.5f) + (priority_score * 0.5f);
-        }
+        float final_score = (fov_score * 0.5f) + (priority_score * 0.5f);
         
         if (final_score > best_score) {
             best_score = final_score;
@@ -253,7 +235,7 @@ static target_t get_best_target(vec3_t viewangles, vec3_t eye_pos) {
             best_target.fov = fov_distance;
             vec_copy(best_target.aim_point, target_hitbox.origin);
             best_target.is_visible = true;
-            best_target.priority = get_target_priority(ent);
+            best_target.priority = priority;
             best_target.distance = distance;
         }
     }
@@ -265,29 +247,13 @@ void aimbot(usercmd_t* cmd) {
     if (!g_settings.aimbot_enabled)
         return;
     
-    bool should_run_aimbot = true;
-    bool should_autoshoot = g_settings.aimbot_autoshoot;
     bool fire_button_pressed = (cmd->buttons & IN_ATTACK) != 0;
+    bool should_autoshoot = g_settings.aimbot_autoshoot;
     
-    switch (0) {
-        case 0:
-            should_run_aimbot = true;
-            break;
-        case 1:
-            should_run_aimbot = (cmd->buttons & IN_ATTACK) != 0;
-            break;
-        case 2:
-            should_run_aimbot = (cmd->buttons & IN_ATTACK2) != 0;
-            break;
-        default:
-            should_run_aimbot = true;
-    }
-    
-    if (!should_run_aimbot && !g_settings.aimbot_rage_mode)
+    // Only run aimbot when actually firing
+    if (!fire_button_pressed) {
         return;
-    
-    if (g_settings.aimbot_rage_mode)
-        should_run_aimbot = true;
+    }
     
     bool can_fire = can_shoot();
     
@@ -298,14 +264,7 @@ void aimbot(usercmd_t* cmd) {
     vec3_t engine_viewangles;
     i_engine->GetViewAngles(engine_viewangles);
     
-    vec3_t adjusted_viewangles = engine_viewangles;
-    if (g_settings.aimbot_norecoil) {
-        adjusted_viewangles.x += g_punchAngles.x * AIM_PUNCH_MULT;
-        adjusted_viewangles.y += g_punchAngles.y * AIM_PUNCH_MULT;
-        adjusted_viewangles.z += g_punchAngles.z * AIM_PUNCH_MULT;
-    }
-    
-    target_t best_target = get_best_target(adjusted_viewangles, eye_pos);
+    target_t best_target = get_best_target(engine_viewangles, eye_pos);
     
     if (best_target.entity && best_target.is_visible) {
         vec3_t to_target = vec_sub(best_target.aim_point, eye_pos);
@@ -316,21 +275,24 @@ void aimbot(usercmd_t* cmd) {
         ang_clamp(&delta);
         
         if (g_settings.aimbot_silent) {
-            cmd->viewangles.x = engine_viewangles.x + delta.x;
-            cmd->viewangles.y = engine_viewangles.y + delta.y;
-            cmd->viewangles.z = engine_viewangles.z + delta.z;
+            // Silent aim - just modify cmd->viewangles directly
+            cmd->viewangles.x = aim_angles.x;
+            cmd->viewangles.y = aim_angles.y;
+            cmd->viewangles.z = aim_angles.z;
         } else {
-            float smoothing = SMOOTHING_FACTOR;
+            // Get smoothing from settings - a value of 0 means instant aim
+            float smoothing = g_settings.aimbot_smooth;
             
-            smoothing = g_settings.aimbot_smooth > 0 ? g_settings.aimbot_smooth : SMOOTHING_FACTOR;
-            
-            if (g_settings.aimbot_rage_mode) {
-                smoothing = 1.2f;
+            // If smoothing is set to 0 or very small, aim instantly
+            if (smoothing <= 0.1f) {
+                engine_viewangles.x = aim_angles.x;
+                engine_viewangles.y = aim_angles.y;
+                engine_viewangles.z = aim_angles.z;
+            } else {
+                engine_viewangles.x += delta.x / smoothing;
+                engine_viewangles.y += delta.y / smoothing;
+                engine_viewangles.z += delta.z / smoothing;
             }
-            
-            engine_viewangles.x += delta.x / smoothing;
-            engine_viewangles.y += delta.y / smoothing;
-            engine_viewangles.z += delta.z / smoothing;
             
             ang_clamp(&engine_viewangles);
             
@@ -343,13 +305,9 @@ void aimbot(usercmd_t* cmd) {
         
         if (should_autoshoot && can_fire) {
             if (!g_settings.aimbot_require_key || fire_button_pressed) {
-                if (g_settings.aimbot_rage_mode) {
+                float aim_error = sqrtf(delta.x * delta.x + delta.y * delta.y);
+                if (aim_error < 5.0f) {
                     cmd->buttons |= IN_ATTACK;
-                } else {
-                    float aim_error = sqrtf(delta.x * delta.x + delta.y * delta.y);
-                    if (aim_error < 5.0f) {
-                        cmd->buttons |= IN_ATTACK;
-                    }
                 }
             }
         }

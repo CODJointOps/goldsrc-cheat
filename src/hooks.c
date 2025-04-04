@@ -215,6 +215,7 @@ void h_CL_CreateMove(float frametime, usercmd_t* cmd, int active) {
         }
         
         bhop(cmd);
+        no_recoil(cmd);  // Apply recoil control before aimbot
         aimbot(cmd);
         bullet_tracers(cmd);
         anti_aim(cmd);

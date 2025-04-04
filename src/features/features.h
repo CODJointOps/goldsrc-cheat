@@ -33,6 +33,9 @@ bool chams(void* this_ptr);
 /* src/features/aim.c */
 void aimbot(usercmd_t* cmd);
 
+/* src/features/no_recoil.c */
+void no_recoil(usercmd_t* cmd);
+
 /* src/features/misc.c */
 void custom_crosshair(void);
 void bullet_tracers(usercmd_t* cmd);

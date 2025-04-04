@@ -9,7 +9,7 @@ IMGUI_INCLUDES=-I$(IMGUI_DIR)
 IMGUI_SRCS=$(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_draw.cpp $(IMGUI_DIR)/imgui_tables.cpp $(IMGUI_DIR)/imgui_widgets.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl2.cpp
 IMGUI_OBJS=$(patsubst %.cpp,%.o,$(IMGUI_SRCS))
 
-OBJS=obj/main.c.o obj/globals.c.o obj/settings.c.o obj/hooks.c.o obj/detour.c.o obj/util.c.o obj/features/movement.c.o obj/features/anti_aim.c.o obj/features/fov.c.o obj/features/namechanger.c.o obj/features/esp.c.o obj/features/chams.c.o obj/features/aim.c.o obj/features/misc.c.o obj/features/thirdperson.c.o obj/game_detection.c.o obj/menu.c.o $(IMGUI_OBJS)
+OBJS=obj/main.c.o obj/globals.c.o obj/settings.c.o obj/hooks.c.o obj/detour.c.o obj/util.c.o obj/features/movement.c.o obj/features/anti_aim.c.o obj/features/fov.c.o obj/features/namechanger.c.o obj/features/esp.c.o obj/features/chams.c.o obj/features/aim.c.o obj/features/misc.c.o obj/features/thirdperson.c.o obj/features/no_recoil.c.o obj/game_detection.c.o obj/menu.c.o $(IMGUI_OBJS)
 BIN=libhlcheat.so
 
 .PHONY: clean all inject
