@@ -33,7 +33,6 @@ typedef struct {
     bool aimbot_norecoil;
     bool aimbot_recoil_comp;
     bool aimbot_friendly_fire;
-    bool aimbot_rage_mode;
     bool aimbot_team_attack;
     int aimbot_hitbox;
     

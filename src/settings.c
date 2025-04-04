@@ -150,7 +150,6 @@ void settings_reset(void) {
     g_settings.aimbot_norecoil = false;
     g_settings.aimbot_recoil_comp = false;
     g_settings.aimbot_friendly_fire = false;
-    g_settings.aimbot_rage_mode = false;
     g_settings.aimbot_team_attack = false;
     g_settings.aimbot_require_key = false;
     
