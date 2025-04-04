@@ -187,7 +187,7 @@ extern "C" void menu_render(void) {
                     }
                     
                     if (g_settings.aimbot_enabled) {
-                        if (ImGui::SliderFloat("FOV", &g_settings.aimbot_fov, 0.1f, 180.0f, "%.1f")) {
+                        if (ImGui::SliderFloat("FOV", &g_settings.aimbot_fov, 0.1f, 360.0f, "%.1f")) {
                         }
                         
                         if (ImGui::SliderFloat("Smoothing", &g_settings.aimbot_smooth, 1.0f, 100.0f, "%.1f")) {
@@ -223,7 +223,6 @@ extern "C" void menu_render(void) {
                         ImGui::Checkbox("No Recoil", &g_settings.aimbot_norecoil);
                         ImGui::Checkbox("Recoil Compensation", &g_settings.aimbot_recoil_comp);
                         ImGui::Checkbox("Shoot Teammates", &g_settings.aimbot_team_attack);
-                        ImGui::Checkbox("Rage Mode", &g_settings.aimbot_rage_mode);
                     }
                     
                     ImGui::EndTabItem();
@@ -549,7 +548,7 @@ static void render_fallback_menu(void) {
     snprintf(buffer, sizeof(buffer), "- Chams: %s", chams_enabled ? "ON" : "OFF");
     i_engine->pfnDrawConsoleString(x1+30, y, buffer);
     y += 30;
-    
+
     i_engine->pfnDrawSetTextColor(1.0f, 1.0f, 0.0f);
     i_engine->pfnDrawConsoleString(x1+20, y, "Press INSERT to close menu");
     y += 20;
