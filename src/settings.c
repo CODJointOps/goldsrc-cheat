@@ -46,6 +46,7 @@ bool create_root_default_config(void) {
     preset.chams = true;
     preset.aimbot_enabled = true;
     preset.aimbot_fov = 5.0f;
+    preset.aimbot_smoothing_enabled = true;
     preset.bhop = true;
     preset.autostrafe = true;
     preset.thirdperson = false;
@@ -152,6 +153,7 @@ void settings_reset(void) {
     g_settings.aimbot_friendly_fire = false;
     g_settings.aimbot_team_attack = false;
     g_settings.aimbot_require_key = false;
+    g_settings.aimbot_smoothing_enabled = true;
     
     g_settings.bhop = false;
     g_settings.autostrafe = false;

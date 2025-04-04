@@ -250,7 +250,6 @@ void aimbot(usercmd_t* cmd) {
     bool fire_button_pressed = (cmd->buttons & IN_ATTACK) != 0;
     bool should_autoshoot = g_settings.aimbot_autoshoot;
     
-    // Only run aimbot when actually firing
     if (!fire_button_pressed) {
         return;
     }
@@ -280,18 +279,20 @@ void aimbot(usercmd_t* cmd) {
             cmd->viewangles.y = aim_angles.y;
             cmd->viewangles.z = aim_angles.z;
         } else {
-            // Get smoothing from settings - a value of 0 means instant aim
-            float smoothing = g_settings.aimbot_smooth;
-            
-            // If smoothing is set to 0 or very small, aim instantly
-            if (smoothing <= 0.1f) {
-                engine_viewangles.x = aim_angles.x;
-                engine_viewangles.y = aim_angles.y;
-                engine_viewangles.z = aim_angles.z;
-            } else {
+            if (g_settings.aimbot_smoothing_enabled) {
+                float smoothing = g_settings.aimbot_smooth;
+                
+                if (smoothing <= 0.1f) {
+                    smoothing = 0.1f;
+                }
+                
                 engine_viewangles.x += delta.x / smoothing;
                 engine_viewangles.y += delta.y / smoothing;
                 engine_viewangles.z += delta.z / smoothing;
+            } else {
+                engine_viewangles.x = aim_angles.x;
+                engine_viewangles.y = aim_angles.y;
+                engine_viewangles.z = aim_angles.z;
             }
             
             ang_clamp(&engine_viewangles);

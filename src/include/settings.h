@@ -27,6 +27,7 @@ typedef struct {
     bool aimbot_enabled;
     float aimbot_fov;
     float aimbot_smooth;
+    bool aimbot_smoothing_enabled;
     bool aimbot_silent;
     bool aimbot_autoshoot;
     bool aimbot_require_key;
@@ -67,6 +68,7 @@ inline void init_default_settings(void) {
     
     g_settings.aimbot_fov = 5.0f;
     g_settings.aimbot_smooth = 10.0f;
+    g_settings.aimbot_smoothing_enabled = true;
     g_settings.aimbot_hitbox = 0;
     
     g_settings.esp_mode = ESP_OFF;

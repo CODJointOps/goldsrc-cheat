@@ -190,7 +190,11 @@ extern "C" void menu_render(void) {
                         if (ImGui::SliderFloat("FOV", &g_settings.aimbot_fov, 0.1f, 360.0f, "%.1f")) {
                         }
                         
-                        if (ImGui::SliderFloat("Smoothing", &g_settings.aimbot_smooth, 1.0f, 100.0f, "%.1f")) {
+                        ImGui::Checkbox("Enable Smoothing", &g_settings.aimbot_smoothing_enabled);
+                        
+                        if (g_settings.aimbot_smoothing_enabled) {
+                            if (ImGui::SliderFloat("Smoothing", &g_settings.aimbot_smooth, 1.0f, 100.0f, "%.1f")) {
+                            }
                         }
                         
                         const char* hitbox_items[] = { "Head", "Chest", "Stomach", "Pelvis", "Nearest" };
@@ -529,9 +533,11 @@ static void render_fallback_menu(void) {
         i_engine->pfnDrawConsoleString(x1+30, y, buffer);
         y += 15;
         
-        snprintf(buffer, sizeof(buffer), "- Smoothing: %.1f", g_settings.aimbot_smooth);
-        i_engine->pfnDrawConsoleString(x1+30, y, buffer);
-        y += 15;
+        if (g_settings.aimbot_smoothing_enabled) {
+            snprintf(buffer, sizeof(buffer), "- Smoothing: %.1f", g_settings.aimbot_smooth);
+            i_engine->pfnDrawConsoleString(x1+30, y, buffer);
+            y += 15;
+        }
     }
     
     y += 10;
