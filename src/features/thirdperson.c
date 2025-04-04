@@ -39,13 +39,29 @@ void thirdperson_toggle(void) {
 }
 
 bool thirdperson_key_event(int keynum, int down) {
-    if (down && (keynum == 'C' || keynum == 'c' || keynum == 99)) {
-        thirdperson_toggle();
-        return true;
+    i_engine->Con_Printf("Thirdperson key event: keynum=%d, down=%d, configured=%d\n", 
+                      keynum, down, g_settings.thirdperson_key);
+    
+    if (!down) {
+        return false;
     }
     
-    if (down && keynum == g_settings.thirdperson_key && 
-        g_settings.thirdperson_key != 'C' && g_settings.thirdperson_key != 'c') {
+    bool should_toggle = false;
+    
+    if (keynum == 'C' || keynum == 'c' || keynum == 67 || keynum == 99) {
+        i_engine->Con_Printf("C key detected (keynum=%d)\n", keynum);
+        if (g_settings.thirdperson_key == 'C' || g_settings.thirdperson_key == 'c' || 
+            g_settings.thirdperson_key == 67 || g_settings.thirdperson_key == 99) {
+            should_toggle = true;
+        }
+    }
+    
+    else if (keynum == g_settings.thirdperson_key) {
+        i_engine->Con_Printf("Configured key detected (keynum=%d)\n", keynum);
+        should_toggle = true;
+    }
+    
+    if (should_toggle) {
         thirdperson_toggle();
         return true;
     }
