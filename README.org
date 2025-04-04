@@ -24,25 +24,42 @@ Also make sure to check out [[https://github.com/deboogerxyz/ahc][deboogerxyz/ah
 
 * Features
 
-| Feature    | Command                | Values                |
-|------------|------------------------|-----------------------|
-| Bhop       | =dz_movement_bhop=     | off/on                |
-| Autostrafe | =dz_movement_autostrafe= | off/rage/legit        |
-| Aimbot     | =dz_aim_aimbot=        | off/fov               |
-| Autoshoot  | =dz_aim_autoshoot=     | off/on                |
-| ESP        | =dz_visuals_esp=       | off/3d-box/name/all   |
-| Chams      | =dz_visuals_chams=     | off/players/hands/all |
-| Crosshair  | =dz_visuals_crosshair= | off/length            |
-| Tracers    | =dz_visuals_tracers=   | off/on                |
-| Namechanger| =dz_misc_namechanger=  | off/team/enemy/all    |
+| Feature     | Description                       |
+|-------------|-----------------------------------|
+| Bhop        | Automatically jump when landing   |
+| Autostrafe  | Automatic strafing movement       |
+| Aimbot      | Aim assistance with FOV control   |
+| Autoshoot   | Automatically shoot at enemies    |
+| ESP         | See enemies through walls         |
+| Chams       | Colored player models             |
+| Crosshair   | Custom crosshair                  |
+| Tracers     | Show bullet paths                 |
+| Namechanger | Automatically change player name  |
+| ThirdPerson | Third-person camera view          |
+
+#+begin_quote
+*Note:* All features can now be controlled via the ImGui menu (press INSERT to open).
+#+end_quote
+
+* GUI Menu
+
+The cheat includes a full graphical user interface that can be opened by pressing the *INSERT* key. The menu includes several tabs:
+
+- *Aimbot:* Configure aimbot settings including FOV, smoothing, and autoshoot
+- *Visuals:* ESP, chams, crosshair and other visual enhancements
+- *Misc:* Various utilities including name changer
+- *Movement:* Bunny hop and auto-strafe settings
+- *ThirdPerson:* Configure third-person camera view and key binding
+- *Config:* Save and load configurations, set default settings
+
+Key features of the menu:
+- Press INSERT to toggle the menu on/off
+- Settings are automatically saved to =~/.config/dz-goldsrccheat/=
+- Default settings can be saved and will automatically load on startup
+- Bind custom keys for features like third-person toggle
 
 #+begin_quote
 *Note:* Aimbot FOV goes from 0 (off) to 180 (all enemies)
-#+end_quote
-
-#+begin_quote
-*Note:* If =dz_autoshoot= is enabled, and =dz_aimbot= is enabled, it will stop
-attacking if there is no visible target.
 #+end_quote
 
 #+begin_quote
@@ -54,10 +71,6 @@ console variables than more customization at runtime.
 #+begin_quote
 *Note:* Bullet tracer color, width and time can be changed at the bottom of the
 =bullet_tracers()= function inside [[https://git.deadzone.lol/Wizzard/goldsrc-cheat/src/branch/main/src/features/misc.c][src/features/misc.c]]. See previous chams note.
-#+end_quote
-
-#+begin_quote
-*Note:* You can disable the watermark with dz_watermark 0
 #+end_quote
 
 * Building
