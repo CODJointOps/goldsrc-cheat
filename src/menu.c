@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <dirent.h>
 
 #define IMGUI_IMPLEMENTATION
 #include "include/menu.h"
@@ -21,6 +23,10 @@ bool g_imgui_initialized = false;
 
 bool g_waiting_for_key_bind = false;
 const char* g_current_key_binding_action = NULL;
+
+static bool s_need_refresh_configs = true;
+static char s_config_files[32][64] = {0};
+static int s_config_file_count = 0;
 
 static void render_fallback_menu(void);
 
@@ -162,6 +168,7 @@ extern "C" void menu_render(void) {
         
         ImGuiIO& io = ImGui::GetIO();
         io.DisplaySize = ImVec2((float)scr_inf.iWidth, (float)scr_inf.iHeight);
+        io.DeltaTime = 1.0f / 60.0f;
         
         ImGui_ImplOpenGL2_NewFrame();
         ImGui::NewFrame();
@@ -356,6 +363,164 @@ extern "C" void menu_render(void) {
                     ImGui::EndTabItem();
                 }
                 
+                if (ImGui::BeginTabItem("Config")) {
+                    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Configuration System");
+                    ImGui::Separator();
+                    
+                    static char config_name[64] = "default";
+                    ImGui::Text("Config Name:");
+                    ImGui::PushItemWidth(200);
+                    ImGui::InputText("##ConfigName", config_name, sizeof(config_name));
+                    ImGui::PopItemWidth();
+                    
+                    if (ImGui::Button("Save Config", ImVec2(120, 30))) {
+                        if (settings_save_to_file(config_name)) {
+                            ImGui::OpenPopup("ConfigSaved");
+                            s_need_refresh_configs = true;
+                        } else {
+                            ImGui::OpenPopup("ConfigError");
+                        }
+                    }
+                    
+                    ImGui::SameLine();
+                    
+                    if (ImGui::Button("Load Config", ImVec2(120, 30))) {
+                        if (settings_load_from_file(config_name)) {
+                            ImGui::OpenPopup("ConfigLoaded");
+                        } else {
+                            ImGui::OpenPopup("ConfigError");
+                        }
+                    }
+                    
+                    ImGui::SameLine();
+                    
+                    if (ImGui::Button("Reset to Default", ImVec2(120, 30))) {
+                        ImGui::OpenPopup("ConfirmReset");
+                    }
+                    
+                    ImGui::Separator();
+                    
+                    if (ImGui::Button("Delete Config", ImVec2(120, 30))) {
+                        ImGui::OpenPopup("ConfirmDelete");
+                    }
+                    
+                    if (ImGui::BeginPopupModal("ConfirmReset", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+                        ImGui::Text("Are you sure you want to reset all settings?");
+                        ImGui::Text("This cannot be undone!");
+                        ImGui::Separator();
+                        
+                        if (ImGui::Button("Yes", ImVec2(120, 0))) {
+                            settings_reset();
+                            ImGui::CloseCurrentPopup();
+                        }
+                        
+                        ImGui::SameLine();
+                        if (ImGui::Button("No", ImVec2(120, 0))) {
+                            ImGui::CloseCurrentPopup();
+                        }
+                        
+                        ImGui::EndPopup();
+                    }
+                    
+                    if (ImGui::BeginPopupModal("ConfirmDelete", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+                        ImGui::Text("Are you sure you want to delete this config?");
+                        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "%s.cfg", config_name);
+                        ImGui::Text("This cannot be undone!");
+                        ImGui::Separator();
+                        
+                        if (ImGui::Button("Yes", ImVec2(120, 0))) {
+                            const char* config_dir = get_config_dir();
+                            if (config_dir) {
+                                char filepath[1024];
+                                snprintf(filepath, sizeof(filepath), "%s/%s.cfg", config_dir, config_name);
+                                
+                                if (remove(filepath) == 0) {
+                                    i_engine->Con_Printf("Deleted config file: %s\n", filepath);
+                                    s_need_refresh_configs = true;
+                                    ImGui::CloseCurrentPopup();
+                                } else {
+                                    i_engine->Con_Printf("Error deleting config file: %s\n", filepath);
+                                    ImGui::OpenPopup("ConfigError");
+                                }
+                            }
+                            ImGui::CloseCurrentPopup();
+                        }
+                        
+                        ImGui::SameLine();
+                        if (ImGui::Button("No", ImVec2(120, 0))) {
+                            ImGui::CloseCurrentPopup();
+                        }
+                        
+                        ImGui::EndPopup();
+                    }
+                    
+                    if (ImGui::BeginPopupModal("ConfigSaved", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+                        ImGui::Text("Configuration saved successfully!");
+                        if (ImGui::Button("OK", ImVec2(120, 0))) {
+                            ImGui::CloseCurrentPopup();
+                        }
+                        ImGui::EndPopup();
+                    }
+                    
+                    if (ImGui::BeginPopupModal("ConfigLoaded", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+                        ImGui::Text("Configuration loaded successfully!");
+                        if (ImGui::Button("OK", ImVec2(120, 0))) {
+                            ImGui::CloseCurrentPopup();
+                        }
+                        ImGui::EndPopup();
+                    }
+                    
+                    if (ImGui::BeginPopupModal("ConfigError", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+                        ImGui::Text("Error with configuration operation!");
+                        ImGui::Text("Check console for details.");
+                        if (ImGui::Button("OK", ImVec2(120, 0))) {
+                            ImGui::CloseCurrentPopup();
+                        }
+                        ImGui::EndPopup();
+                    }
+                    
+                    ImGui::Separator();
+                    ImGui::Text("Available Configs:");
+                    
+                    if (s_need_refresh_configs) {
+                        memset(s_config_files, 0, sizeof(s_config_files));
+                        s_config_file_count = 0;
+                        
+                        const char* config_dir = get_config_dir();
+                        if (config_dir) {
+                            DIR* dir = opendir(config_dir);
+                            if (dir) {
+                                struct dirent* entry;
+                                while ((entry = readdir(dir)) != NULL && s_config_file_count < 32) {
+                                    size_t len = strlen(entry->d_name);
+                                    if (len > 4 && strcmp(entry->d_name + len - 4, ".cfg") == 0) {
+                                        strncpy(s_config_files[s_config_file_count], entry->d_name, len - 4);
+                                        s_config_files[s_config_file_count][len - 4] = '\0';
+                                        s_config_file_count++;
+                                    }
+                                }
+                                closedir(dir);
+                            }
+                        }
+                        s_need_refresh_configs = false;
+                    }
+                    
+                    if (ImGui::Button("Refresh List", ImVec2(120, 25))) {
+                        s_need_refresh_configs = true;
+                    }
+                    
+                    ImGui::BeginChild("ConfigList", ImVec2(0, 150), true);
+                    for (int i = 0; i < s_config_file_count; i++) {
+                        if (ImGui::Selectable(s_config_files[i], false)) {
+                            strncpy(config_name, s_config_files[i], sizeof(config_name) - 1);
+                            config_name[sizeof(config_name) - 1] = '\0';
+                        }
+                    }
+                    ImGui::EndChild();
+                    
+                    ImGui::EndTabItem();
+                }
+                
                 ImGui::EndTabBar();
             }
             
@@ -440,11 +605,33 @@ extern "C" void menu_key_event(int keynum, int down) {
     i_engine->Con_Printf("menu_key_event called: keynum=%d, down=%d, waiting_for_key=%d\n", 
                        keynum, down, g_waiting_for_key_bind);
     
+    if (g_menu_open && g_imgui_initialized && g_imgui_context) {
+        ImGui::SetCurrentContext(g_imgui_context);
+        ImGuiIO& io = ImGui::GetIO();
+        
+        switch (keynum) {
+            case K_TAB:        io.AddKeyEvent(ImGuiKey_Tab, down); break;
+            case K_LEFTARROW:  io.AddKeyEvent(ImGuiKey_LeftArrow, down); break;
+            case K_RIGHTARROW: io.AddKeyEvent(ImGuiKey_RightArrow, down); break;
+            case K_UPARROW:    io.AddKeyEvent(ImGuiKey_UpArrow, down); break;
+            case K_DOWNARROW:  io.AddKeyEvent(ImGuiKey_DownArrow, down); break;
+            case K_BACKSPACE:  io.AddKeyEvent(ImGuiKey_Backspace, down); break;
+            case K_DEL:        io.AddKeyEvent(ImGuiKey_Delete, down); break;
+            case K_ENTER:      io.AddKeyEvent(ImGuiKey_Enter, down); break;
+            case K_HOME:       io.AddKeyEvent(ImGuiKey_Home, down); break;
+            case K_END:        io.AddKeyEvent(ImGuiKey_End, down); break;
+            case K_ESCAPE:     io.AddKeyEvent(ImGuiKey_Escape, down); break;
+            case K_CTRL:       io.AddKeyEvent(ImGuiKey_LeftCtrl, down); break;
+            case K_SHIFT:      io.AddKeyEvent(ImGuiKey_LeftShift, down); break;
+            case K_ALT:        io.AddKeyEvent(ImGuiKey_LeftAlt, down); break;
+            default: break;
+        }
+    }
+    
     if (g_waiting_for_key_bind && down && keynum != K_ESCAPE) {
         i_engine->Con_Printf("Processing key bind: keynum=%d, action=%s\n", 
                            keynum, g_current_key_binding_action ? g_current_key_binding_action : "none");
                            
-        // Skip wheel events and menu toggle key
         if (keynum != K_MWHEELDOWN && keynum != K_MWHEELUP && keynum != K_INS) {
             if (g_current_key_binding_action && strcmp(g_current_key_binding_action, "thirdperson") == 0) {
                 g_settings.thirdperson_key = keynum;
@@ -490,4 +677,13 @@ extern "C" void menu_key_event(int keynum, int down) {
             i_engine->Con_Printf("Mouse reactivated for game\n");
         }
     }
+}
+
+extern "C" void menu_char_event(int ascii) {
+    if (!g_menu_open || !g_imgui_initialized || !g_imgui_context)
+        return;
+    
+    ImGui::SetCurrentContext(g_imgui_context);
+    ImGuiIO& io = ImGui::GetIO();
+    io.AddInputCharacter((unsigned int)ascii);
 } 

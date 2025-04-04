@@ -13,6 +13,7 @@ bool menu_init(void);
 void menu_shutdown(void);
 void menu_render(void);
 void menu_key_event(int keynum, int down);
+void menu_char_event(int ascii);
 
 extern bool g_menu_open;
 extern bool g_imgui_initialized;

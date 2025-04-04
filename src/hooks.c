@@ -413,24 +413,36 @@ void h_CL_Move(void)
 /*----------------------------------------------------------------------------*/
 
 int h_HUD_Key_Event(int down, int keynum, const char* pszCurrentBinding) {
-    // Debug output for important keys
     if (keynum == 'C' || keynum == 'c' || keynum == 67 || keynum == 99 || 
         keynum == g_settings.thirdperson_key || keynum == K_INS) {
         i_engine->Con_Printf("Key event: down=%d, keynum=%d, binding=%s\n", 
                            down, keynum, pszCurrentBinding ? pszCurrentBinding : "none");
     }
     
-    // Check if menu is in key binding mode - this must come first
+    if (g_menu_open) {
+        if (keynum == K_BACKSPACE || keynum == K_DEL || 
+            keynum == K_LEFTARROW || keynum == K_RIGHTARROW || 
+            keynum == K_UPARROW || keynum == K_DOWNARROW ||
+            keynum == K_HOME || keynum == K_END ||
+            keynum == K_ENTER || keynum == K_TAB ||
+            keynum == K_CTRL || keynum == K_SHIFT || keynum == K_ALT) {
+            
+            menu_key_event(keynum, down);
+            return 0;
+        } else if (down && keynum >= 32 && keynum <= 126) {
+            menu_char_event(keynum);
+        }
+    }
+    
     extern bool g_waiting_for_key_bind;
     if (g_waiting_for_key_bind && down) {
         menu_key_event(keynum, down);
         return 0;
     }
     
-    // Then try thirdperson key handling
     if (thirdperson_key_event(keynum, down)) {
         i_engine->Con_Printf("Thirdperson key event handled successfully\n");
-        return 0; // The key was handled by thirdperson
+        return 0;
     }
     
     if (down && (keynum == K_INS || (pszCurrentBinding && strcmp(pszCurrentBinding, "dz_menu") == 0))) {
