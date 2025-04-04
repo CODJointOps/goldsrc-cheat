@@ -54,6 +54,7 @@ bool create_root_default_config(void) {
     preset.watermark = true;
     preset.watermark_rainbow = true;
     preset.fov = 90.0f;
+    preset.menu_allow_movement = true;
     
     FILE* file = fopen("../default.cfg", "wb");
     if (!file) {
@@ -115,7 +116,6 @@ void settings_init(void) {
             i_engine->Con_Printf("Error copying project config, using defaults\n");
         }
     }
-    // No config exists, create it with defaults
     else {
         i_engine->Con_Printf("No config found anywhere, creating default config with current settings\n");
         
