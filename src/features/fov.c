@@ -2,9 +2,9 @@
 #include "../include/globals.h"
 #include "../include/sdk.h"
 #include "../include/util.h"
+#include "../include/settings.h"
 #include "features.h"
 
-extern cvar_t* dz_visuals_fov;
 extern float* scr_fov_value;
 
 void fov_adjust(usercmd_t* cmd) {
@@ -13,7 +13,7 @@ void fov_adjust(usercmd_t* cmd) {
         return;
     }
 
-    if (dz_visuals_fov->value) {
-        *scr_fov_value = dz_visuals_fov->value;
+    if (g_settings.fov > 0) {
+        *scr_fov_value = g_settings.fov;
     }
 }

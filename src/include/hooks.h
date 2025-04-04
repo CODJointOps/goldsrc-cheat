@@ -1,4 +1,3 @@
-
 #ifndef HOOKS_H_
 #define HOOKS_H_
 
@@ -8,6 +7,12 @@
 
 #include <dlfcn.h> /* dlsym */
 #include <GL/gl.h> /* GLFloat */
+#include <stdint.h>
+
+typedef void (*hook_func_t)(void);
+
+typedef int (*key_event_func_t)(int down, int keynum, const char* pszCurrentBinding);
+
 /*
  * Table of prefixes:
  *   prefix | meaning
@@ -51,18 +56,15 @@
  * GL_HOOK: Hooks a OpenGL function. Example:
  *
  *   GL_HOOK(glColor4f);
- *     void** hp_glColor4f = (void**)dlsym(hw, "qglColor4f"); // Ptr
- *     ho_glColor4f = (glColor4f_t)(*hp_glColor4f);      // Original from ptr
- *     *hp_glColor4f = (void*)h_glColor4f;               // Set ptr to our func
-
- * Note: ho_glColor4f and h_glColor4f sould be declared with DECL_HOOK_EXTERN
  *
+ *   Will store the original function in o_glColor4f and set the function to
+ *   h_glColor4f (which must be defined)
  *
  * GL_UNHOOK: Restores a OpenGL hook created by GL_HOOK. Example:
  *
  *   GL_UNHOOK(glColor4f);
- *     void** hp_glColor4f = (void**)dlsym(hw, "qglColor4f"); // Ptr
- *     *hp_glColor4f = (void*)ho_glColor4f;                   // Set to original
+ *
+ *   Will restore the original function from o_glColor4f to the original pointer.
  */
 #define DECL_HOOK_EXTERN(type, name, ...)  \
     typedef type (*name##_t)(__VA_ARGS__); \
@@ -77,19 +79,27 @@
 
 #define ORIGINAL(name, ...) ho_##name(__VA_ARGS__);
 
-#define GL_HOOK(name)                                \
-    void** hp_##name = (void**)dlsym(hw, "q" #name); \
-    ho_##name        = (name##_t)(*hp_##name);       \
-    *hp_##name       = (void*)h_##name;
+#define GL_HOOK(ret_type, name, ...) \
+    typedef ret_type (*name##_t)(__VA_ARGS__); \
+    name##_t h_##name; \
+    name##_t o_##name;
 
-#define GL_UNHOOK(name)                              \
-    void** hp_##name = (void**)dlsym(hw, "q" #name); \
-    *hp_##name       = (void*)ho_##name;
+#define GL_UNHOOK(name) \
+    o_##name = h_##name;
 
-/*----------------------------------------------------------------------------*/
+/* For GL hooking */
+typedef void (*glColor4f_t)(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
+typedef void* (*wglSwapBuffers_t)(void*);
 
-bool hooks_init(void);
-void hooks_restore(void);
+/* OpenGL hooks */
+extern void h_glColor4f(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
+extern void* o_glColor4f;
+
+extern wglSwapBuffers_t o_wglSwapBuffers;
+
+/* HUD_Key_Event hook */
+extern int h_HUD_Key_Event(int down, int keynum, const char* pszCurrentBinding);
+extern key_event_func_t ho_HUD_Key_Event;
 
 /* VMT hooks */
 DECL_HOOK_EXTERN(void, CL_CreateMove, float, usercmd_t*, int);
@@ -100,10 +110,16 @@ DECL_HOOK_EXTERN(void, HUD_PostRunCmd, struct local_state_s*,
                  struct local_state_s*, struct usercmd_s*, int, double,
                  unsigned int);
 
-/* OpenGL hooks */
-DECL_HOOK_EXTERN(void, glColor4f, GLfloat, GLfloat, GLfloat, GLfloat);
-
 /* Detour hooks */
 DECL_HOOK_EXTERN(void, CL_Move);
+
+/* Detour for CL_Move */
+#define ORIGINAL_DETOUR(type) ((type)detour_get_original(&detour_data_clmove))()
+
+/*----------------------------------------------------------------------------*/
+
+bool hooks_init(void);
+void hooks_restore(void);
+void hooks_schedule_uninject(void);
 
 #endif /* HOOKS_H_ */

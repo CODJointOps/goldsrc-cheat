@@ -1,11 +1,10 @@
-
 #include <stdio.h>
 #include <math.h>
 
 #include "features.h"
 #include "../include/sdk.h"
 #include "../include/globals.h"
-#include "../include/cvars.h"
+#include "../include/settings.h"
 #include "../include/util.h"
 
 static void autostrafe_legit(usercmd_t* cmd) {
@@ -65,7 +64,7 @@ static void autostrafe_rage(usercmd_t* cmd) {
 }
 
 void bhop(usercmd_t* cmd) {
-    if (!CVAR_ON(movement_bhop) || i_pmove->movetype != MOVETYPE_WALK)
+    if (!g_settings.bhop || i_pmove->movetype != MOVETYPE_WALK)
         return;
 
     static bool was_in_air = false;
@@ -81,18 +80,8 @@ void bhop(usercmd_t* cmd) {
     was_in_air = (i_pmove->flags & FL_ONGROUND) == 0;
 
     /* Autostrafe if enabled. Check if we are in the air and holding space. */
-    if (is_jumping) {
-        switch ((int)dz_movement_autostrafe->value) {
-            case 1:
-                autostrafe_rage(cmd);
-                break;
-            case 2:
-                autostrafe_legit(cmd);
-                break;
-            case 0:
-            default:
-                break;
-        }
+    if (is_jumping && g_settings.autostrafe) {
+        autostrafe_rage(cmd);
     }
 }
 

@@ -1,18 +1,11 @@
-
 #include <stdint.h>
 #include "features.h"
 #include "../include/globals.h"
-#include "../include/cvars.h"
+#include "../include/settings.h"
 #include "../include/util.h"
 #include "../include/game_detection.h"
 
-/* For dz_esp */
-enum esp_values {
-    ESP_OFF  = 0,
-    ESP_BOX  = 1,
-    ESP_NAME = 2,
-    /* ESP_ALL should be 3 but we can just OR box and name */
-};
+// ESP enums moved to settings.h as esp_mode_t
 
 bool gl_draw3dbox(vec3_t o, int bh, int bw, int lw) {
     /*
@@ -99,7 +92,7 @@ static bool gl_draw2dbox(vec3_t o, int bh) {
 }
 
 void esp(void) {
-    const int setting = (int)dz_visuals_esp->value;
+    const int setting = g_settings.esp_mode;
     if (setting == ESP_OFF)
         return;
 
@@ -109,7 +102,7 @@ void esp(void) {
         if (!valid_player(ent) || !is_alive(ent) || vec_is_zero(ent->origin))
             continue;
 
-        if (is_friend(ent) && dz_visuals_friendly->value == 0)
+        if (is_friend(ent) && !g_settings.esp_friendly)
             continue;
 
         int bh = 70;

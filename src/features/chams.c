@@ -1,7 +1,6 @@
-
 #include "features.h"
 #include "../include/globals.h"
-#include "../include/cvars.h"
+#include "../include/settings.h"
 #include "../include/util.h"
 
 #include <GL/gl.h>
@@ -15,7 +14,7 @@ enum chams_settings {
 visible_flags visible_mode;
 
 bool chams(void* this_ptr) {
-    const int setting = dz_visuals_chams->value == 5.0f ? 7 : dz_visuals_chams->value;
+    const int setting = g_settings.chams ? PLAYER_CHAMS : DISABLED;
     if (setting == DISABLED)
         return false;
 
@@ -39,8 +38,7 @@ bool chams(void* this_ptr) {
 
     const bool friendly = is_friend(ent);
 
-    // Check if the player is friendly and if visuals_friendly is 0
-    if (friendly && dz_visuals_friendly->value == 0)
+    if (friendly && !g_settings.esp_friendly)
         return false;  // Do not render chams for friendlies
 
     /* If we got here it means we are rendering a valid player */

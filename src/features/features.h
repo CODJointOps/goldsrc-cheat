@@ -1,4 +1,3 @@
-
 #ifndef FEATURES_H_
 #define FEATURES_H_
 
@@ -11,7 +10,12 @@ enum visible_flags {
     FRIEND_VISIBLE     = 3,
     FRIEND_NOT_VISIBLE = 4,
     HANDS              = 5,
+    SCOPE              = 6,
 };
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*----------------------------------------------------------------------------*/
 
@@ -41,5 +45,14 @@ void anti_aim(usercmd_t* cmd);
 
 /* src/features/fov.c */
 void fov_adjust(usercmd_t* cmd);
+
+/* src/features/thirdperson.c */
+void thirdperson_init(void);
+void thirdperson_update(void);
+bool thirdperson_key_event(int keynum, int down);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* FEATURES_H_ */

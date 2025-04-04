@@ -1,13 +1,12 @@
-
 #include "features.h"
 #include "../include/sdk.h"
 #include "../include/globals.h"
-#include "../include/cvars.h"
 #include "../include/util.h"
 #include "../include/game_detection.h"
+#include "../include/settings.h"
 
 void custom_crosshair(void) {
-    if (!CVAR_ON(visuals_crosshair))
+    if (!g_settings.custom_crosshair)
         return;
 
     /* Get window size, and then the center. */
@@ -15,7 +14,7 @@ void custom_crosshair(void) {
     int my = game_info->m_height / 2;
 
     /* The real length is sqrt(2 * (len^2)) */
-    const int len   = dz_visuals_crosshair->value;
+    const int len   = 5;
     const int gap   = 1;
     const float w   = 1;
     const rgb_t col = { 255, 255, 255 };
@@ -37,7 +36,7 @@ static double lastTracerTime = 0;
 static bool attackReleased = true;
 
 void bullet_tracers(usercmd_t* cmd) {
-    if (!CVAR_ON(visuals_tracers) || !is_alive(localplayer))
+    if (!g_settings.tracers || !is_alive(localplayer))
         return;
 
     if (IsCS16()) {

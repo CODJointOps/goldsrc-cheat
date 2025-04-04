@@ -4,7 +4,7 @@
 #include <vector>
 #include "features.h"
 #include "../include/globals.h"
-#include "../include/cvars.h"
+#include "../include/settings.h"
 #include "../include/util.h"
 #include "../include/game_detection.h"
 
@@ -70,14 +70,20 @@ void change_name_all_players() {
 }
 
 void change_name_based_on_mode(usercmd_t* cmd) {
-    if (!CVAR_ON(misc_namechanger)) return;
+    if (!g_settings.namechanger) return;
 
-    if (++change_counter < dz_misc_namechanger_speed->value) {
+    if (++change_counter < g_settings.namechanger_speed) {
         return;
     }
     change_counter = 0;
 
-    switch ((int)dz_misc_namechanger->value) {
+    int mode = 3;
+    
+    if (g_settings.namechanger) {
+        mode = 3;
+    }
+    
+    switch (mode) {
         case 1:
             change_name_teammates();
             break;
@@ -93,7 +99,7 @@ void change_name_based_on_mode(usercmd_t* cmd) {
 }
 
 void check_namechanger_mode_and_execute(usercmd_t* cmd) {
-    if (!CVAR_ON(misc_namechanger)) return;
+    if (!g_settings.namechanger) return;
 
     change_name_based_on_mode(cmd);
 }

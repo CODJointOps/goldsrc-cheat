@@ -6,7 +6,7 @@
 
 #include "features.h"
 #include "../include/sdk.h"
-#include "../include/cvars.h"
+#include "../include/settings.h"
 #include "../include/util.h"
 
 float random_float(float min, float max) {
@@ -16,7 +16,7 @@ float random_float(float min, float max) {
 bool isSpacebarPressed() {
     Display* display = XOpenDisplay(NULL);
     if (!display) {
-        return false;  // Could not open the display, assume not pressed
+        return false;
     }
 
     char keys_return[32];
@@ -38,7 +38,7 @@ void anti_aim(usercmd_t* cmd) {
         return;
     }
 
-    if (!CVAR_ON(movement_antiaim)) {
+    if (!g_settings.antiaim) {
         return;
     }
     
@@ -68,8 +68,7 @@ void anti_aim(usercmd_t* cmd) {
     bool isBunnyHopping = cmd->buttons & IN_JUMP;
     bool isStationary = (cmd->forwardmove == 0.0f && cmd->sidemove == 0.0f);
     
-    // This shit busted right now
-    if (CVAR_ON(movement_fakeduck) && (isStationary || isBunnyHopping || isSpacebarPressed())) {
+    if (g_settings.fakeduck && (isStationary || isBunnyHopping || isSpacebarPressed())) {
         static int duckCounter = 0;
         if (duckCounter < 2) {
             cmd->buttons |= IN_DUCK;
@@ -84,7 +83,7 @@ void anti_aim(usercmd_t* cmd) {
     if (view_angles.y > 180.0f) view_angles.y -= 360.0f;
     if (view_angles.y < -180.0f) view_angles.y += 360.0f;
 
-    if (CVAR_ON(movement_antiaim_view)) {
+    if (g_settings.antiaim_view) {
         i_engine->SetViewAngles(view_angles);
         i_engine->pfnClientCmd("echo \"Set view angles directly using movement_antiaim_view.\"");
     } else {

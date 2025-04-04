@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <dlfcn.h>
-#include <sys/mman.h> /* PROT_* */
+#include <sys/mman.h>
 
 #include "include/globals.h"
 #include "include/sdk.h"
@@ -11,7 +11,6 @@
 game_id this_game_id = HL;
 vec3_t g_punchAngles = { 0, 0, 0 };
 
-/* Weapon info */
 float g_flNextAttack = 0.f, g_flNextPrimaryAttack = 0.f;
 int g_iClip = 0;
 
@@ -26,13 +25,10 @@ DECL_INTF(playermove_t, pmove);
 DECL_INTF(engine_studio_api_t, enginestudio);
 DECL_INTF(StudioModelRenderer_t, studiomodelrenderer);
 
-/* Game struct with some useful info */
 game_t* game_info;
 
-/* Array of extra_player_info's for each player */
 void* player_extra_info;
 
-/* Updated in CL_CreateMove hook */
 cl_entity_t* localplayer = NULL;
 
 float* scr_fov_value = NULL;
@@ -40,11 +36,6 @@ float* scr_fov_value = NULL;
 /*----------------------------------------------------------------------------*/
 
 bool globals_init(void) {
-    /*
-     * Get handler for hw.so
-     *  RTLD_LAZY: If the symbol is never referenced, then it is never resolved.
-     *  RTLD_NOLOAD: Don't load the shared object.
-     */
     hw = dlopen("hw.so", RTLD_LAZY | RTLD_NOLOAD);
     if (!hw) {
         printf("goldsource-cheat: globals_init: can't open hw.so\n");
@@ -57,7 +48,6 @@ bool globals_init(void) {
         return false;
     }
 
-    /* Get symbol addresses using dlsym and the handler we just opened */
     i_engine       = (cl_enginefunc_t*)dlsym(hw, "cl_enginefuncs");
     i_client       = (cl_clientfunc_t*)dlsym(hw, "cl_funcs");
     i_pmove        = *(playermove_t**)dlsym(hw, "pmove");
