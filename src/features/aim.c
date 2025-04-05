@@ -33,6 +33,13 @@
 #define PRIORITY_MEDIUM 2 
 #define PRIORITY_HIGH   3
 
+// Weapon IDs
+#define WEAPON_GLOCK  17
+#define WEAPON_DEAGLE 26
+#define WEAPON_AK47   28
+#define WEAPON_M4A1   22
+#define WEAPON_AWP    33
+
 extern const char* hitbox_options[];
 extern int current_hitbox;
 
@@ -60,7 +67,7 @@ bool get_hitbox(cl_entity_t* ent, int hitbox_id, hitbox_t* out_hitbox) {
 
     out_hitbox->radius = 5.0f;
     
-    bool is_ak47 = (g_currentWeaponID == 30);
+    bool is_ak47 = (g_currentWeaponID == WEAPON_AK47);
     
     studiohdr_t* studio = NULL;
     if (ent->model) {
@@ -321,7 +328,7 @@ void aimbot(usercmd_t* cmd) {
     }
     
     if (cmd->buttons & IN_ATTACK) {
-        if (g_currentWeaponID == 30) {
+        if (g_currentWeaponID == WEAPON_AK47) {
             viewangles.x -= g_punchAngles[0] * 1.2f;
             viewangles.y -= g_punchAngles[1] * 0.8f;
             
@@ -348,7 +355,7 @@ void aimbot(usercmd_t* cmd) {
     vec3_t aim_direction = vec_sub(best_target.aim_point, eye_pos);
     vec3_t aim_angles = vec_to_ang(aim_direction);
     
-    if (g_currentWeaponID == 30) {
+    if (g_currentWeaponID == WEAPON_AK47) {
         if (shot_count > 0) {
             float ak_compensation = CLAMP(shot_count * 0.25f, 0.0f, 6.0f);
             
@@ -375,7 +382,7 @@ void aimbot(usercmd_t* cmd) {
         
         float smooth_factor = g_settings.aimbot_smooth;
         
-        if (g_currentWeaponID == 30 && shot_count > 1) {
+        if (g_currentWeaponID == WEAPON_AK47 && shot_count > 1) {
             smooth_factor *= 0.7f;
         }
         

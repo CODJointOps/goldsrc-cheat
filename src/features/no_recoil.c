@@ -10,10 +10,11 @@ static time_t last_log_time = 0;
 static vec3_t last_punch = {0, 0, 0};
 static vec3_t previous_viewangles = {0, 0, 0};
 
-#define WEAPON_AK47   30
-#define WEAPON_M4A1   31
-#define WEAPON_AWP    33
+#define WEAPON_GLOCK  17
 #define WEAPON_DEAGLE 26
+#define WEAPON_AK47   28
+#define WEAPON_M4A1   22
+#define WEAPON_AWP    33
 
 #define AK47_RECOIL_VERT_MULT    2.8f
 #define AK47_RECOIL_HORIZ_MULT   0.9f
