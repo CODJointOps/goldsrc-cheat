@@ -264,21 +264,35 @@ void anti_aim(usercmd_t* cmd) {
             next_switch = g_flCurrentTime + random_float(0.4f, 0.8f);
         }
         
+        if (!g_settings.antiaim_view) {
+            vec3_t real_angles;
+            i_engine->GetViewAngles(real_angles);
+            
+            vec3_t server_angles;
+            vec_copy(server_angles, real_angles);
+            server_angles.y += (switch_side ? 58.0f : -58.0f);
+            
+            if (server_angles.y > 180.0f) server_angles.y -= 360.0f;
+            if (server_angles.y < -180.0f) server_angles.y += 360.0f;
+            
+            vec_copy(cmd->viewangles, server_angles);
+            i_engine->SetViewAngles(real_angles);
+            
+            static float last_desync_log = 0.0f;
+            if (g_flCurrentTime > last_desync_log + 3.0f) {
+                i_engine->Con_Printf("Desync active: Server %.1f, Client %.1f (invisible to user)\n", 
+                                   server_angles.y, real_angles.y);
+                last_desync_log = g_flCurrentTime;
+            }
+            
+            return;
+        }
+        
         float desync_amount = switch_side ? 58.0f : -58.0f;
-        
-        static vec3_t real_angles;
-        vec_copy(real_angles, view_angles);
-        
         view_angles.y += desync_amount;
         
         if (view_angles.y > 180.0f) view_angles.y -= 360.0f;
         if (view_angles.y < -180.0f) view_angles.y += 360.0f;
-        
-        if (!g_settings.antiaim_view) {
-            vec_copy(cmd->viewangles, view_angles);
-            i_engine->SetViewAngles(real_angles);
-            return;
-        }
     }
 
     bool should_fake_duck = false;
