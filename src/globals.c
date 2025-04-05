@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <string.h>
 #include <dlfcn.h>
@@ -13,6 +12,7 @@ vec3_t g_punchAngles = { 0, 0, 0 };
 
 float g_flNextAttack = 0.f, g_flNextPrimaryAttack = 0.f;
 int g_iClip = 0;
+int g_currentWeaponID = -1;
 
 double g_flCurrentTime = 0.0;
 

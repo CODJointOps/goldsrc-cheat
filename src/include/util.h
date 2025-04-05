@@ -23,8 +23,8 @@ typedef struct {
 
 #define DEG2RAD(n) ((n)*M_PI / 180.0f)
 #define RAD2DEG(n) ((n)*180.0f / M_PI)
-#define CLAMP(val, min, max) \
-    (((val) > (max)) ? (max) : (((val) < (min)) ? (min) : (val)))
+
+#define CLAMP(x, min, max) ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
 
 #define gl_drawline_points(p0, p1, w, col) \
     gl_drawline(p0[0], p0[1], p1[0], p1[1], w, col);

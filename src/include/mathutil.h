@@ -1,8 +1,8 @@
-
 #ifndef MATHUTIL_H_
 #define MATHUTIL_H_ 1
 
 #include "sdk.h"
+#include "util.h"
 
 /* Vector 2 for 2d points */
 typedef float vec2_t[2];
@@ -11,8 +11,6 @@ typedef float vec2_t[2];
 
 #define DEG2RAD(n) ((n)*M_PI / 180.0f)
 #define RAD2DEG(n) ((n)*180.0f / M_PI)
-#define CLAMP(val, min, max)                                                   \
-    (((val) > (max)) ? (max) : (((val) < (min)) ? (min) : (val)))
 
 /* Use indexes so it works for float[] as well as vec3_t */
 #define vec_copy(dst, src)                                                     \

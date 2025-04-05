@@ -162,6 +162,27 @@ void settings_reset(void) {
     g_settings.fakeduck = false;
     g_settings.clmove = false;
     
+    // Reset anti-aim settings
+    g_settings.antiaim_enabled = false;
+    g_settings.antiaim_pitch_enabled = false;
+    g_settings.antiaim_yaw_enabled = false;
+    g_settings.antiaim_pitch = 89.0f;
+    g_settings.antiaim_yaw = 180.0f;
+    g_settings.antiaim_fakeduck = false;
+    g_settings.antiaim_fakeduck_key = 0;
+    g_settings.antiaim_desync = false;
+    g_settings.antiaim_legit = false;
+    
+    // Reset advanced anti-aim settings
+    g_settings.antiaim_pitch_mode = 1;      // Down (89°)
+    g_settings.antiaim_yaw_mode = 1;        // Backward (180°)
+    g_settings.antiaim_custom_pitch = 0.0f;
+    g_settings.antiaim_custom_yaw = 0.0f;
+    g_settings.antiaim_spin_speed = 360.0f; // One rotation per second
+    g_settings.antiaim_jitter_range = 45.0f; // ±45 degrees jitter
+    g_settings.antiaim_lby_breaker = false;
+    g_settings.antiaim_on_attack = false;
+    
     g_settings.namechanger = false;
     
     g_settings.fov = 90.0f;

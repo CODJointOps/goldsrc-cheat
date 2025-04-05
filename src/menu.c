@@ -9,6 +9,7 @@
 #include "include/globals.h"
 #include "include/settings.h"
 #include "include/hooks.h"
+#include "include/util.h"
 #include <GL/gl.h>
 
 #include "include/sdk/public/keydefs.h"
@@ -183,24 +184,94 @@ extern "C" void menu_render(void) {
             if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None)) {
                 
                 if (ImGui::BeginTabItem("Aimbot")) {
+                    // Main aimbot settings section
+                    ImGui::Text("Aimbot Settings");
+                    ImGui::Separator();
+                    
                     if (ImGui::Checkbox("Enable Aimbot", &g_settings.aimbot_enabled)) {
                     }
                     
                     if (g_settings.aimbot_enabled) {
-                        if (ImGui::SliderFloat("FOV", &g_settings.aimbot_fov, 0.1f, 360.0f, "%.1f")) {
+                        // Target selection section
+                        ImGui::Text("Target Selection:");
+                        
+                        if (ImGui::SliderFloat("FOV", &g_settings.aimbot_fov, 0.1f, 180.0f, "%.1f")) {
+                            // Ensure value stays within limits
+                            g_settings.aimbot_fov = CLAMP(g_settings.aimbot_fov, 0.1f, 180.0f);
                         }
                         
-                        ImGui::Checkbox("Enable Smoothing", &g_settings.aimbot_smoothing_enabled);
-                        
-                        if (g_settings.aimbot_smoothing_enabled) {
-                            if (ImGui::SliderFloat("Smoothing", &g_settings.aimbot_smooth, 1.0f, 100.0f, "%.1f")) {
-                            }
+                        ImGui::SameLine();
+                        ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.1f, 1.0f), "?");
+                        if (ImGui::IsItemHovered()) {
+                            ImGui::BeginTooltip();
+                            ImGui::Text("Field of view for target selection.\nSmaller values = more precise targeting");
+                            ImGui::EndTooltip();
                         }
                         
                         const char* hitbox_items[] = { "Head", "Chest", "Stomach", "Pelvis", "Nearest" };
                         if (ImGui::Combo("Hitbox", &g_settings.aimbot_hitbox, hitbox_items, 5)) {
                             current_hitbox = g_settings.aimbot_hitbox;
                         }
+                        
+                        ImGui::Checkbox("Shoot Teammates", &g_settings.aimbot_team_attack);
+                        
+                        // Aiming behavior section
+                        ImGui::Separator();
+                        ImGui::Text("Aiming Behavior:");
+                        
+                        ImGui::Checkbox("Enable Smoothing", &g_settings.aimbot_smoothing_enabled);
+                        
+                        if (g_settings.aimbot_smoothing_enabled) {
+                            ImGui::SameLine();
+                            ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.1f, 1.0f), "?");
+                            if (ImGui::IsItemHovered()) {
+                                ImGui::BeginTooltip();
+                                ImGui::Text("Makes aim movement look more natural");
+                                ImGui::EndTooltip();
+                            }
+                            
+                            if (ImGui::SliderFloat("Smoothing", &g_settings.aimbot_smooth, 1.0f, 100.0f, "%.1f")) {
+                                // Ensure value stays within limits
+                                g_settings.aimbot_smooth = CLAMP(g_settings.aimbot_smooth, 1.0f, 100.0f);
+                            }
+                            
+                            ImGui::Text("Lower = Faster | Higher = Smoother");
+                        }
+                        
+                        ImGui::Checkbox("Silent Aim", &g_settings.aimbot_silent);
+                        ImGui::SameLine();
+                        ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.1f, 1.0f), "?");
+                        if (ImGui::IsItemHovered()) {
+                            ImGui::BeginTooltip();
+                            ImGui::Text("Aim is only visible server-side, not in your view");
+                            ImGui::EndTooltip();
+                        }
+                        
+                        // Recoil control section
+                        ImGui::Separator();
+                        ImGui::Text("Recoil Control:");
+                        
+                        ImGui::Checkbox("No Recoil", &g_settings.aimbot_norecoil);
+                        ImGui::SameLine();
+                        ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.1f, 1.0f), "?");
+                        if (ImGui::IsItemHovered()) {
+                            ImGui::BeginTooltip();
+                            ImGui::Text("Completely removes recoil effect");
+                            ImGui::EndTooltip();
+                        }
+                        
+                        ImGui::Checkbox("Recoil Compensation", &g_settings.aimbot_recoil_comp);
+                        ImGui::SameLine();
+                        ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.1f, 1.0f), "?");
+                        if (ImGui::IsItemHovered()) {
+                            ImGui::BeginTooltip();
+                            ImGui::Text("Dynamic recoil correction for weapons like AK-47\nAdjusts aim based on spray pattern");
+                            ImGui::EndTooltip();
+                        }
+                        
+                        // Auto shoot section
+                        ImGui::Separator();
+                        ImGui::Text("Auto Functions:");
                         
                         ImGui::Checkbox("Auto Shoot", &g_settings.aimbot_autoshoot);
                         
@@ -223,10 +294,13 @@ extern "C" void menu_render(void) {
                             ImGui::Unindent(20);
                         }
                         
-                        ImGui::Checkbox("Silent Aim", &g_settings.aimbot_silent);
-                        ImGui::Checkbox("No Recoil", &g_settings.aimbot_norecoil);
-                        ImGui::Checkbox("Recoil Compensation", &g_settings.aimbot_recoil_comp);
-                        ImGui::Checkbox("Shoot Teammates", &g_settings.aimbot_team_attack);
+                        // Weapon info section
+                        ImGui::Separator();
+                        ImGui::Text("Current Weapon: %s (ID: %d)", 
+                                   g_currentWeaponID == 7 ? "AK-47" : 
+                                   g_currentWeaponID == 16 ? "M4A1" : 
+                                   g_currentWeaponID == 1 ? "Desert Eagle" : "Unknown",
+                                   g_currentWeaponID);
                     }
                     
                     ImGui::EndTabItem();
@@ -271,6 +345,233 @@ extern "C" void menu_render(void) {
                     ImGui::EndTabItem();
                 }
                 
+                if (ImGui::BeginTabItem("Anti-Aim")) {
+                    ImGui::Text("Anti-Aim Settings");
+                    ImGui::Separator();
+                    
+                    if (ImGui::Checkbox("Enable Anti-Aim", &g_settings.antiaim_enabled)) {
+                        if (g_settings.antiaim_enabled) {
+                            i_engine->Con_Printf("Anti-Aim enabled\n");
+                        } else {
+                            i_engine->Con_Printf("Anti-Aim disabled\n");
+                        }
+                    }
+                    
+                    ImGui::SameLine();
+                    ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.1f, 1.0f), "?");
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::BeginTooltip();
+                        ImGui::Text("Master switch for all anti-aim features");
+                        ImGui::EndTooltip();
+                    }
+                    
+                    if (g_settings.antiaim_enabled) {
+                        ImGui::Separator();
+                        ImGui::Text("Pitch Control:");
+                        
+                        if (ImGui::Checkbox("Enable Pitch Anti-Aim", &g_settings.antiaim_pitch_enabled)) {
+                            if (g_settings.antiaim_pitch_enabled) {
+                                i_engine->Con_Printf("Pitch Anti-Aim enabled\n");
+                            } else {
+                                i_engine->Con_Printf("Pitch Anti-Aim disabled\n");
+                            }
+                        }
+                        
+                        if (g_settings.antiaim_pitch_enabled) {
+                            const char* pitch_items[] = {"Fixed", "Down (89°)", "Up (-89°)", "Zero (0°)", "Jitter", "Custom"};
+                            if (ImGui::Combo("Pitch Mode", &g_settings.antiaim_pitch_mode, pitch_items, 6)) {
+                                // Reset custom pitch if mode changed
+                                if (g_settings.antiaim_pitch_mode != 5) { // Not custom
+                                    g_settings.antiaim_custom_pitch = 0.0f;
+                                }
+                            }
+                            
+                            // Show settings based on mode
+                            if (g_settings.antiaim_pitch_mode == 0) { // Fixed
+                                ImGui::SliderFloat("Pitch Angle", &g_settings.antiaim_pitch, -89.0f, 89.0f, "%.1f°");
+                            }
+                            else if (g_settings.antiaim_pitch_mode == 5) { // Custom
+                                ImGui::SliderFloat("Custom Pitch", &g_settings.antiaim_custom_pitch, -89.0f, 89.0f, "%.1f°");
+                            }
+                        }
+                        
+                        ImGui::Separator();
+                        ImGui::Text("Yaw Control:");
+                        
+                        if (ImGui::Checkbox("Enable Yaw Anti-Aim", &g_settings.antiaim_yaw_enabled)) {
+                            if (g_settings.antiaim_yaw_enabled) {
+                                i_engine->Con_Printf("Yaw Anti-Aim enabled\n");
+                            } else {
+                                i_engine->Con_Printf("Yaw Anti-Aim disabled\n");
+                            }
+                        }
+                        
+                        if (g_settings.antiaim_yaw_enabled) {
+                            const char* yaw_items[] = {"Fixed", "Backward (180°)", "Spin", "Jitter", "Sideways", "Custom"};
+                            if (ImGui::Combo("Yaw Mode", &g_settings.antiaim_yaw_mode, yaw_items, 6)) {
+                                // Reset custom yaw if mode changed
+                                if (g_settings.antiaim_yaw_mode != 5) { // Not custom
+                                    g_settings.antiaim_custom_yaw = 0.0f;
+                                }
+                            }
+                            
+                            // Show settings based on mode
+                            if (g_settings.antiaim_yaw_mode == 0) { // Fixed
+                                ImGui::SliderFloat("Yaw Angle", &g_settings.antiaim_yaw, -180.0f, 180.0f, "%.1f°");
+                            }
+                            else if (g_settings.antiaim_yaw_mode == 2) { // Spin
+                                ImGui::SliderFloat("Spin Speed", &g_settings.antiaim_spin_speed, 10.0f, 1000.0f, "%.1f°/s");
+                                
+                                ImGui::SameLine();
+                                ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.1f, 1.0f), "?");
+                                if (ImGui::IsItemHovered()) {
+                                    ImGui::BeginTooltip();
+                                    ImGui::Text("Controls how fast the spin rotates (degrees per second)");
+                                    ImGui::EndTooltip();
+                                }
+                            }
+                            else if (g_settings.antiaim_yaw_mode == 3) { // Jitter
+                                ImGui::SliderFloat("Jitter Range", &g_settings.antiaim_jitter_range, 5.0f, 180.0f, "%.1f°");
+                                
+                                ImGui::SameLine();
+                                ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.1f, 1.0f), "?");
+                                if (ImGui::IsItemHovered()) {
+                                    ImGui::BeginTooltip();
+                                    ImGui::Text("Controls the maximum angle of random jitter (±degrees)");
+                                    ImGui::EndTooltip();
+                                }
+                            }
+                            else if (g_settings.antiaim_yaw_mode == 5) { // Custom
+                                ImGui::SliderFloat("Custom Yaw", &g_settings.antiaim_custom_yaw, -180.0f, 180.0f, "%.1f°");
+                            }
+                        }
+                        
+                        ImGui::Separator();
+                        ImGui::Text("Additional Options:");
+                        
+                        ImGui::Checkbox("Anti-Aim When Shooting", &g_settings.antiaim_on_attack);
+                        
+                        ImGui::SameLine();
+                        ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.1f, 1.0f), "?");
+                        if (ImGui::IsItemHovered()) {
+                            ImGui::BeginTooltip();
+                            ImGui::Text("Continue anti-aim even when attacking (may affect accuracy)");
+                            ImGui::EndTooltip();
+                        }
+                        
+                        ImGui::Checkbox("LBY Breaker", &g_settings.antiaim_lby_breaker);
+                        
+                        ImGui::SameLine();
+                        ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.1f, 1.0f), "?");
+                        if (ImGui::IsItemHovered()) {
+                            ImGui::BeginTooltip();
+                            ImGui::Text("Breaks lower body yaw for more effective anti-aim");
+                            ImGui::EndTooltip();
+                        }
+                        
+                        ImGui::Checkbox("Desync", &g_settings.antiaim_desync);
+                        
+                        ImGui::SameLine();
+                        ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.1f, 1.0f), "?");
+                        if (ImGui::IsItemHovered()) {
+                            ImGui::BeginTooltip();
+                            ImGui::Text("Creates a desync between client and server angles.\nMakes you harder to hit but may cause visual glitches.");
+                            ImGui::EndTooltip();
+                        }
+                        
+                        ImGui::Checkbox("Legit Anti-Aim", &g_settings.antiaim_legit);
+                        
+                        ImGui::SameLine();
+                        ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.1f, 1.0f), "?");
+                        if (ImGui::IsItemHovered()) {
+                            ImGui::BeginTooltip();
+                            ImGui::Text("Less obvious anti-aim that's harder to detect visually.\nLess effective than rage anti-aim but less noticeable.");
+                            ImGui::EndTooltip();
+                        }
+                        
+                        ImGui::Checkbox("Show in First Person", &g_settings.antiaim_view);
+                        
+                        ImGui::SameLine();
+                        ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.1f, 1.0f), "?");
+                        if (ImGui::IsItemHovered()) {
+                            ImGui::BeginTooltip();
+                            ImGui::Text("When enabled, you'll see your anti-aim from first person.\nWhen disabled, only others see your anti-aim.");
+                            ImGui::EndTooltip();
+                        }
+                        
+                        ImGui::Checkbox("Fake Duck", &g_settings.antiaim_fakeduck);
+                        
+                        ImGui::SameLine();
+                        ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.1f, 1.0f), "?");
+                        if (ImGui::IsItemHovered()) {
+                            ImGui::BeginTooltip();
+                            ImGui::Text("Rapidly switches between duck and stand positions.\nMakes you harder to hit while appearing ducked to others.");
+                            ImGui::EndTooltip();
+                        }
+                        
+                        if (g_settings.antiaim_fakeduck) {
+                            const char* key_name = "None";
+                            if (g_settings.antiaim_fakeduck_key > 0) {
+                                // Convert key code to name
+                                switch(g_settings.antiaim_fakeduck_key) {
+                                    case 'F': key_name = "F"; break;
+                                    case 'V': key_name = "V"; break;
+                                    case 'T': key_name = "T"; break;
+                                    case 'P': key_name = "P"; break;
+                                    case 'C': key_name = "C"; break;
+                                    case K_F1: key_name = "F1"; break;
+                                    case K_F2: key_name = "F2"; break;
+                                    case K_F3: key_name = "F3"; break;
+                                    case K_F4: key_name = "F4"; break;
+                                    case K_F5: key_name = "F5"; break;
+                                    case K_TAB: key_name = "Tab"; break;
+                                    case K_SPACE: key_name = "Space"; break;
+                                    case K_CTRL: key_name = "Ctrl"; break;
+                                    case K_SHIFT: key_name = "Shift"; break;
+                                    case K_ALT: key_name = "Alt"; break;
+                                    case K_MOUSE1: key_name = "Mouse1"; break;
+                                    case K_MOUSE2: key_name = "Mouse2"; break;
+                                    case K_MOUSE3: key_name = "Mouse3"; break;
+                                    default: {
+                                        if (g_settings.antiaim_fakeduck_key >= 32 && g_settings.antiaim_fakeduck_key <= 126) {
+                                            static char chr[2] = {0};
+                                            chr[0] = (char)g_settings.antiaim_fakeduck_key;
+                                            key_name = chr;
+                                        } else {
+                                            static char code[32] = {0};
+                                            snprintf(code, sizeof(code), "Key %d", g_settings.antiaim_fakeduck_key);
+                                            key_name = code;
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            ImGui::Text("Fake Duck Key: %s", key_name);
+                            
+                            if (g_waiting_for_key_bind && g_current_key_binding_action && strcmp(g_current_key_binding_action, "fakeduck") == 0) {
+                                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.1f, 0.1f, 1.0f));
+                                ImGui::Button("Press any key...", ImVec2(150, 25));
+                                ImGui::PopStyleColor();
+                            } else {
+                                if (ImGui::Button("Bind Fake Duck Key", ImVec2(150, 25))) {
+                                    g_waiting_for_key_bind = true;
+                                    g_current_key_binding_action = "fakeduck";
+                                    i_engine->Con_Printf("Press any key to bind for fake duck\n");
+                                }
+                            }
+                            
+                            ImGui::SameLine();
+                            
+                            if (ImGui::Button("Clear##FakeDuckKey", ImVec2(80, 25))) {
+                                g_settings.antiaim_fakeduck_key = 0;
+                                i_engine->Con_Printf("Fake duck key binding cleared\n");
+                            }
+                        }
+                    }
+                    
+                    ImGui::EndTabItem();
+                }
+                
                 if (ImGui::BeginTabItem("Misc")) {
                     ImGui::Checkbox("Name Changer", &g_settings.namechanger);
                     
@@ -288,6 +589,21 @@ extern "C" void menu_render(void) {
                     
                     ImGui::Text("Menu Settings:");
                     ImGui::Checkbox("Allow Movement (WASD) With Menu Open", &g_settings.menu_allow_movement);
+                    
+                    ImGui::Separator();
+                    
+                    if (ImGui::Button("Reset Settings", ImVec2(150, 30))) {
+                        settings_reset();
+                        i_engine->pfnClientCmd("echo \"All settings have been reset to defaults.\"");
+                    }
+                    
+                    ImGui::SameLine();
+                    ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.1f, 1.0f), "?");
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::BeginTooltip();
+                        ImGui::Text("Reset all settings to default values");
+                        ImGui::EndTooltip();
+                    }
                     
                     ImGui::Separator();
                     

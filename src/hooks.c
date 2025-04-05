@@ -320,6 +320,15 @@ void h_HUD_PostRunCmd(struct local_state_s* from, struct local_state_s* to,
         g_flNextPrimaryAttack =
           to->weapondata[to->client.m_iId].m_flNextPrimaryAttack;
         g_iClip = to->weapondata[to->client.m_iId].m_iClip;
+        
+        // Track current weapon ID
+        int weaponId = to->client.m_iId;
+        
+        // Update global weapon ID if it changed
+        if (g_currentWeaponID != weaponId) {
+            g_currentWeaponID = weaponId;
+            i_engine->Con_Printf("Weapon changed: ID=%d\n", g_currentWeaponID);
+        }
     }
 }
 

@@ -1,4 +1,3 @@
-
 #ifndef GLOBALS_H_
 #define GLOBALS_H_
 
@@ -39,6 +38,7 @@ extern vec3_t g_punchAngles;
 extern float g_flNextAttack, g_flNextPrimaryAttack;
 extern float* scr_fov_value;
 extern int g_iClip;
+extern int g_currentWeaponID;
 extern double g_flCurrentTime;
 
 extern void* hw;
