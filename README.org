@@ -7,6 +7,9 @@
 
 #+TOC: headlines 2
 
+* WARNING
+TO USE THIS YOU MUST BE RUNNING THE LEGACY BETA
+
 * Description
 Simple linux cheat for most goldsrc games, made in C.
 
