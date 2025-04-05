@@ -54,85 +54,137 @@ typedef struct {
 } hitbox_t;
 
 bool get_hitbox(cl_entity_t* ent, int hitbox_index, hitbox_t* out_hitbox) {
-    if (!ent || !ent->model || !out_hitbox)
+    if (!ent || !out_hitbox)
         return false;
 
-    studiohdr_t* studio_model = (studiohdr_t*)i_enginestudio->Mod_Extradata(ent->model);
-    if (!studio_model)
-        return false;
+    vec_copy(out_hitbox->origin, ent->origin);
+    out_hitbox->radius = 12.0f;
+
+    if (ent->model) {
+        studiohdr_t* studio = (studiohdr_t*)i_enginestudio->Mod_Extradata(ent->model);
+        if (studio) {
+            if (hitbox_index == HITBOX_HEAD) {
+                vec3_t view_offset;
+                view_offset.x = 0.0f;
+                view_offset.y = 0.0f;
+                view_offset.z = 28.0f;
+                
+                if (!ent->player) {
+                    view_offset.z = 25.0f;
+                }
+                
+                out_hitbox->origin = vec_add(ent->origin, view_offset);
+                
+                vec3_t head_offset;
+                head_offset.x = 0.0f;
+                head_offset.y = 0.0f;
+                head_offset.z = 0.0f;
+                
+                float yaw = ent->angles.y * (M_PI / 180.0f);
+                head_offset.x = cos(yaw) * 3.0f;
+                head_offset.y = sin(yaw) * 3.0f;
+                
+                out_hitbox->origin = vec_add(out_hitbox->origin, head_offset);
+                out_hitbox->radius = 5.0f;
+                
+                static int debug_count = 0;
+                if (debug_count++ % 500 == 0) {
+                    printf("Head hitbox: origin=(%.1f, %.1f, %.1f), radius=%.1f\n", 
+                        out_hitbox->origin.x, out_hitbox->origin.y, out_hitbox->origin.z, out_hitbox->radius);
+                }
+                
+                return true;
+            }
+            else if (hitbox_index == HITBOX_CHEST) {
+                vec3_t chest_offset;
+                chest_offset.x = 0.0f;
+                chest_offset.y = 0.0f;
+                chest_offset.z = 18.0f;
+                
+                out_hitbox->origin = vec_add(ent->origin, chest_offset);
+                out_hitbox->radius = 10.0f;
+                return true;
+            }
+            else if (hitbox_index == HITBOX_STOMACH) {
+                vec3_t stomach_offset;
+                stomach_offset.x = 0.0f;
+                stomach_offset.y = 0.0f;
+                stomach_offset.z = 12.0f;
+                
+                out_hitbox->origin = vec_add(ent->origin, stomach_offset);
+                out_hitbox->radius = 10.0f;
+                return true;
+            }
+            else if (hitbox_index == HITBOX_PELVIS) {
+                vec3_t pelvis_offset;
+                pelvis_offset.x = 0.0f;
+                pelvis_offset.y = 0.0f;
+                pelvis_offset.z = 8.0f;
+                
+                out_hitbox->origin = vec_add(ent->origin, pelvis_offset);
+                out_hitbox->radius = 8.0f; 
+                return true;
+            }
+        }
+    }
     
-    mstudiobbox_t* studio_box = NULL;
-    if (studio_model->hitboxindex) {
-        studio_box = (mstudiobbox_t*)((byte*)studio_model + studio_model->hitboxindex);
-        if (hitbox_index >= studio_model->numhitboxes || hitbox_index < 0)
-            return false;
+    switch (hitbox_index) {
+        case HITBOX_HEAD:
+            out_hitbox->origin.z += 32.0f;
+            out_hitbox->radius = 7.0f;
+            break;
             
-        studio_box += hitbox_index;
-    } else {
-        return false;
+        case HITBOX_CHEST:
+            out_hitbox->origin.z += 20.0f;
+            out_hitbox->radius = 10.0f;
+            break;
+            
+        case HITBOX_STOMACH:
+            out_hitbox->origin.z += 12.0f;
+            out_hitbox->radius = 10.0f;
+            break;
+            
+        case HITBOX_PELVIS:
+            out_hitbox->origin.z += 6.0f;
+            out_hitbox->radius = 8.0f;
+            break;
+            
+        default:
+            out_hitbox->origin.z += 16.0f;
+            out_hitbox->radius = 12.0f;
+            break;
     }
-    
-    vec_copy(out_hitbox->mins, studio_box->bbmin);
-    vec_copy(out_hitbox->maxs, studio_box->bbmax);
-    
-    vec3_t center;
-    center.x = (out_hitbox->mins.x + out_hitbox->maxs.x) * 0.5f;
-    center.y = (out_hitbox->mins.y + out_hitbox->maxs.y) * 0.5f;
-    center.z = (out_hitbox->mins.z + out_hitbox->maxs.z) * 0.5f;
-    
-    vec3_t angles;
-    vec_copy(angles, ent->angles);
-    
-    int bone = studio_box->bone;
-    if (bone >= 0 && bone < studio_model->numbones) {
-        mstudiobone_t* pbone = (mstudiobone_t*)((byte*)studio_model + studio_model->boneindex);
-        pbone += bone;
-        
-        angles[0] = pbone->value[0]; 
-        angles[1] = pbone->value[1];
-        angles[2] = pbone->value[2];
-    }
-    
-    vec3_t forward, right, up;
-    i_engine->pfnAngleVectors(angles, forward, right, up);
-    
-    vec3_t offset;
-    offset.x = center.x * forward.x + center.y * right.x + center.z * up.x;
-    offset.y = center.x * forward.y + center.y * right.y + center.z * up.y;
-    offset.z = center.x * forward.z + center.y * right.z + center.z * up.z;
-    
-    out_hitbox->origin = vec_add(ent->origin, offset);
-    
-    if (hitbox_index == HITBOX_HEAD) {
-        out_hitbox->origin.z += 8.0f;
-    }
-    
-    vec3_t size;
-    size.x = fabs(out_hitbox->maxs.x - out_hitbox->mins.x) * 0.5f;
-    size.y = fabs(out_hitbox->maxs.y - out_hitbox->mins.y) * 0.5f;
-    size.z = fabs(out_hitbox->maxs.z - out_hitbox->mins.z) * 0.5f;
-    
-    out_hitbox->radius = sqrtf(size.x * size.x + size.y * size.y + size.z * size.z);
-    
+
     return true;
 }
 
 bool is_hitbox_visible(vec3_t eye_pos, hitbox_t* hitbox) {
     if (!hitbox)
         return false;
-        
+    
     pmtrace_t* trace = i_engine->PM_TraceLine(eye_pos, hitbox->origin, PM_TRACELINE_PHYSENTSONLY, 2, -1);
     
-    if (trace->fraction < 1.0f && trace->ent <= 0)
-        return false;
-    
-    if (trace->ent > 0) {
-        const int ent_idx = i_pmove->physents[trace->ent].info;
-        if (get_player(ent_idx))
-            return true;
+    static int trace_debug = 0;
+    if (trace_debug++ % 500 == 0) {
+        printf("Trace: fraction=%.3f, ent=%d\n", trace->fraction, trace->ent);
     }
     
-    return trace->fraction >= 1.0f;
+    if (trace->fraction < 0.9f) {
+        if (trace->ent <= 0) {
+            return false;
+        }
+        
+        const int ent_idx = i_pmove->physents[trace->ent].info;
+        cl_entity_t* hit_entity = get_player(ent_idx);
+        
+        if (hit_entity) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    return true;
 }
 
 typedef struct {
@@ -149,41 +201,6 @@ int get_target_priority(cl_entity_t* ent) {
         return PRIORITY_NONE;
     
     return PRIORITY_MEDIUM;
-}
-
-static bool get_best_hitbox(cl_entity_t* ent, vec3_t eye_pos, hitbox_t* out_hitbox) {
-    if (!ent || !out_hitbox)
-        return false;
-    
-    if (current_hitbox == HITBOX_NEAREST) {
-        float best_distance = 9999.0f;
-        bool found_hitbox = false;
-        
-        for (int i = 0; i < MAX_HITBOXES; i++) {
-            hitbox_t temp_hitbox;
-            if (get_hitbox(ent, i, &temp_hitbox)) {
-                if (is_hitbox_visible(eye_pos, &temp_hitbox)) {
-                    vec3_t to_hitbox = vec_sub(temp_hitbox.origin, eye_pos);
-                    float distance = vec_len2d(to_hitbox);
-                    
-                    if (distance < best_distance) {
-                        best_distance = distance;
-                        *out_hitbox = temp_hitbox;
-                        found_hitbox = true;
-                    }
-                }
-            }
-        }
-        
-        return found_hitbox;
-    } 
-    else {
-        if (get_hitbox(ent, current_hitbox, out_hitbox)) {
-            return is_hitbox_visible(eye_pos, out_hitbox);
-        }
-    }
-    
-    return false;
 }
 
 static target_t get_best_target(vec3_t viewangles, vec3_t eye_pos) {
@@ -203,7 +220,23 @@ static target_t get_best_target(vec3_t viewangles, vec3_t eye_pos) {
         hitbox_t target_hitbox;
         bool hitbox_found = false;
         
-        hitbox_found = get_best_hitbox(ent, eye_pos, &target_hitbox);
+        if (current_hitbox == HITBOX_NEAREST) {
+            const int hitbox_priority[] = {HITBOX_HEAD, HITBOX_CHEST, HITBOX_STOMACH, HITBOX_PELVIS};
+            
+            for (int h = 0; h < 4; h++) {
+                if (get_hitbox(ent, hitbox_priority[h], &target_hitbox)) {
+                    if (is_hitbox_visible(eye_pos, &target_hitbox)) {
+                        hitbox_found = true;
+                        break;
+                    }
+                }
+            }
+        } else {
+            hitbox_found = get_hitbox(ent, current_hitbox, &target_hitbox);
+            if (hitbox_found) {
+                hitbox_found = is_hitbox_visible(eye_pos, &target_hitbox);
+            }
+        }
         
         if (!hitbox_found)
             continue;
@@ -227,7 +260,9 @@ static target_t get_best_target(vec3_t viewangles, vec3_t eye_pos) {
         int priority = get_target_priority(ent);
         float priority_score = priority / (float)PRIORITY_HIGH;
         
-        float final_score = (fov_score * 0.5f) + (priority_score * 0.5f);
+        float distance_score = 1.0f - fmin(1.0f, distance / 3000.0f);
+        
+        float final_score = (fov_score * 0.6f) + (priority_score * 0.3f) + (distance_score * 0.1f);
         
         if (final_score > best_score) {
             best_score = final_score;
@@ -243,18 +278,18 @@ static target_t get_best_target(vec3_t viewangles, vec3_t eye_pos) {
     return best_target;
 }
 
+#define RECOIL_DETECTION_MULT 1.0f
+#define RECOIL_DECAY_RATE 0.5f
+
+static vec3_t s_last_viewangles = {0, 0, 0};
+static vec3_t s_punch_angles = {0, 0, 0};
+static int s_firing_frames = 0;
+
 void aimbot(usercmd_t* cmd) {
     if (!g_settings.aimbot_enabled)
         return;
     
-    bool fire_button_pressed = (cmd->buttons & IN_ATTACK) != 0;
-    bool should_autoshoot = g_settings.aimbot_autoshoot;
-    
-    if (!fire_button_pressed) {
-        return;
-    }
-    
-    bool can_fire = can_shoot();
+    bool original_attack_state = (cmd->buttons & IN_ATTACK) != 0;
     
     vec3_t view_height;
     i_engine->pEventAPI->EV_LocalPlayerViewheight(view_height);
@@ -263,56 +298,142 @@ void aimbot(usercmd_t* cmd) {
     vec3_t engine_viewangles;
     i_engine->GetViewAngles(engine_viewangles);
     
-    target_t best_target = get_best_target(engine_viewangles, eye_pos);
+    // Simplified recoil detection - we'll let no_recoil.c handle actual compensation
+    bool is_firing = original_attack_state && can_shoot();
     
-    if (best_target.entity && best_target.is_visible) {
-        vec3_t to_target = vec_sub(best_target.aim_point, eye_pos);
-        vec3_t aim_angles = vec_to_ang(to_target);
-        
-        vec3_t delta = vec_sub(aim_angles, engine_viewangles);
-        vec_norm(&delta);
-        ang_clamp(&delta);
-        
-        if (g_settings.aimbot_silent) {
-            // Silent aim - just modify cmd->viewangles directly
-            cmd->viewangles.x = aim_angles.x;
-            cmd->viewangles.y = aim_angles.y;
-            cmd->viewangles.z = aim_angles.z;
+    // Just track firing for debugging
+    if (is_firing) {
+        s_firing_frames++;
+    } else {
+        if (s_firing_frames > 0) {
+            s_firing_frames = 0;
+        }
+    }
+    
+    vec_copy(s_last_viewangles, engine_viewangles);
+    
+    target_t best_target = get_best_target(engine_viewangles, eye_pos);
+    bool valid_target_found = (best_target.entity && best_target.is_visible);
+    
+    bool can_fire = can_shoot();
+    
+    static int frame_counter = 0;
+    bool should_debug = (frame_counter++ % 100 == 0);
+    
+    if (should_debug) {
+        printf("Aimbot: Target=%d, CanFire=%d, FOV=%.1f, Frames=%d\n", 
+              valid_target_found, can_fire, 
+              valid_target_found ? best_target.fov : 0.0f,
+              s_firing_frames);
+    }
+    
+    if (!valid_target_found) {
+        if (g_settings.aimbot_autoshoot) {
+            cmd->buttons &= ~IN_ATTACK;
+        }
+        return;
+    }
+    
+    vec3_t to_target = vec_sub(best_target.aim_point, eye_pos);
+    vec3_t aim_angles = vec_to_ang(to_target);
+    
+    ang_clamp(&aim_angles);
+    
+    vec3_t delta = vec_sub(aim_angles, engine_viewangles);
+    vec_norm(&delta);
+    
+    float aim_error = sqrtf(delta.x * delta.x + delta.y * delta.y);
+    bool aimed_accurately = (aim_error < 2.5f);
+    
+    static vec3_t smooth_angles = {0, 0, 0};
+    static bool tracking_active = false;
+    static float tracking_time = 0.0f;
+    
+    if (!tracking_active && valid_target_found) {
+        vec_copy(smooth_angles, engine_viewangles);
+        tracking_active = true;
+        tracking_time = 0.0f;
+    } else if (tracking_active && valid_target_found) {
+        tracking_time += 0.016f;
+        tracking_time = fminf(tracking_time, 1.0f);
+    } else if (tracking_active && !valid_target_found) {
+        tracking_active = false;
+    }
+    
+    if (g_settings.aimbot_silent) {
+        cmd->viewangles.x = aim_angles.x;
+        cmd->viewangles.y = aim_angles.y;
+        cmd->viewangles.z = 0;
+    } else {
+        if (g_settings.aimbot_smoothing_enabled && tracking_active) {
+            float smoothing = g_settings.aimbot_smooth;
+            if (smoothing <= 0.1f) smoothing = 0.1f;
+            
+            float base_factor = 1.0f / (smoothing * 1.5f);
+            float adaptive_factor = base_factor * (1.0f - (tracking_time * 0.5f));
+            
+            float ease_factor = fminf(1.0f, adaptive_factor);
+            float t = 1.0f - pow(1.0f - ease_factor, 3);
+            
+            float pitch_diff = aim_angles.x - smooth_angles.x;
+            if (pitch_diff > 180.0f) pitch_diff -= 360.0f;
+            if (pitch_diff < -180.0f) pitch_diff += 360.0f;
+            smooth_angles.x += pitch_diff * t;
+            
+            float yaw_diff = aim_angles.y - smooth_angles.y;
+            if (yaw_diff > 180.0f) yaw_diff -= 360.0f;
+            if (yaw_diff < -180.0f) yaw_diff += 360.0f;
+            smooth_angles.y += yaw_diff * t;
+            
+            smooth_angles.z = 0;
+            
+            if (smooth_angles.x > 180.0f) smooth_angles.x -= 360.0f;
+            if (smooth_angles.x < -180.0f) smooth_angles.x += 360.0f;
+            if (smooth_angles.y > 180.0f) smooth_angles.y -= 360.0f;
+            if (smooth_angles.y < -180.0f) smooth_angles.y += 360.0f;
+            
+            engine_viewangles = smooth_angles;
         } else {
-            if (g_settings.aimbot_smoothing_enabled) {
-                float smoothing = g_settings.aimbot_smooth;
-                
-                if (smoothing <= 0.1f) {
-                    smoothing = 0.1f;
-                }
-                
-                engine_viewangles.x += delta.x / smoothing;
-                engine_viewangles.y += delta.y / smoothing;
-                engine_viewangles.z += delta.z / smoothing;
-            } else {
-                engine_viewangles.x = aim_angles.x;
-                engine_viewangles.y = aim_angles.y;
-                engine_viewangles.z = aim_angles.z;
-            }
-            
-            ang_clamp(&engine_viewangles);
-            
-            i_engine->SetViewAngles(engine_viewangles);
-            
-            cmd->viewangles.x = engine_viewangles.x;
-            cmd->viewangles.y = engine_viewangles.y;
-            cmd->viewangles.z = engine_viewangles.z;
+            engine_viewangles = aim_angles;
+            vec_copy(smooth_angles, aim_angles);
         }
         
-        if (should_autoshoot && can_fire) {
-            if (!g_settings.aimbot_require_key || fire_button_pressed) {
-                float aim_error = sqrtf(delta.x * delta.x + delta.y * delta.y);
-                if (aim_error < 5.0f) {
+        i_engine->SetViewAngles(engine_viewangles);
+        
+        cmd->viewangles.x = engine_viewangles.x;
+        cmd->viewangles.y = engine_viewangles.y;
+        cmd->viewangles.z = 0;
+    }
+    
+    if (can_fire) {
+        if (g_settings.aimbot_autoshoot && aimed_accurately) {
+            cmd->buttons |= IN_ATTACK;
+            if (should_debug) printf("AUTO-FIRING (error: %.2f)\n", aim_error);
+        }
+        else if (g_settings.aimbot_require_key) {
+            if (original_attack_state) {
+                if (aimed_accurately) {
                     cmd->buttons |= IN_ATTACK;
+                    if (should_debug) printf("MANUAL-FIRING with key (error: %.2f)\n", aim_error);
+                } else {
+                    cmd->buttons &= ~IN_ATTACK;
                 }
+            } else {
+                cmd->buttons &= ~IN_ATTACK;
             }
         }
-    } else if (should_autoshoot) {
-        cmd->buttons &= ~IN_ATTACK;
+        else if (!g_settings.aimbot_require_key) {
+            if (should_debug && original_attack_state) 
+                printf("PRESERVING manual fire\n");
+        }
+    } else {
+        if (g_settings.aimbot_autoshoot || g_settings.aimbot_require_key) {
+            cmd->buttons &= ~IN_ATTACK;
+        }
+        
+        if (should_debug && original_attack_state) {
+            printf("CAN'T FIRE: NextAttack=%.3f, Primary=%.3f\n", 
+                  g_flNextAttack, g_flNextPrimaryAttack);
+        }
     }
 }
